@@ -82,7 +82,7 @@ select { width: 100%; padding: 13px 16px; background: #060E1A; border: 1px solid
 /* Language quick switch */
 .ls-label { font-size: 11px; color: #5A8AAA; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; font-weight: bold; }
 .ls-grid  { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; margin-bottom: 8px; }
-.ls-btn   { padding: 12px 6px; font-size: 14px; font-weight: bold; background: #1B3A6B; color: #88AACC; border: 1px solid #2A5298; border-radius: 6px; cursor: pointer; text-align: center; line-height: 1.2; word-break: break-word; white-space: normal; }
+.ls-btn   { padding: 14px 8px; font-size: 15px; font-weight: bold; background: #1B3A6B; color: #88AACC; border: 1px solid #2A5298; border-radius: 6px; cursor: pointer; text-align: center; line-height: 1.2; word-break: break-word; white-space: normal; }
 .ls-btn.active { background: #2A6DB5; color: #FFF; border-color: #5AA0E9; }
 .ls-btn:active { opacity: 0.8; }
 .als-row  { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; }
@@ -472,7 +472,7 @@ function buildLangGrid() {
   grid.innerHTML = langs.map(code => {
     const name = langNames[code] || code;
     // Truncate to fit button
-    const label = name.length > 10 ? name.slice(0,9)+'…' : name;
+    const label = name.length > 14 ? name.slice(0,13)+'…' : name;
     return `<button class="ls-btn ${code===currentLang?'active':''}" onclick="switchLang('${code}')">${label}</button>`;
   }).join('');
 }
@@ -561,7 +561,7 @@ function startWSS() {
         document.getElementById('als-tog').checked = alsEnabled;
         buildLangGrid();
         // Load attend iframe
-        const iUrl = `https://attend.wordly.ai/frame/${cfg.sessionId}?bgcolor=1A6020&fgcolor=ffffff&finalOnly=true${cfg.passcode?'&key='+encodeURIComponent(cfg.passcode):''}`;
+        const iUrl = `https://attend.wordly.ai/frame/${cfg.sessionId}?bgcolor=0D0C0C&fgcolor=ffffff&finalOnly=true${cfg.passcode?'&key='+encodeURIComponent(cfg.passcode):''}`;
         document.getElementById('s-iframe').src = iUrl;
         // Send start
         ws.send(JSON.stringify({type:'start', languageCode:currentLang, sampleRate:SAMPLE_RATE, dynamicLanguageSelection:{enabled:alsEnabled}}));

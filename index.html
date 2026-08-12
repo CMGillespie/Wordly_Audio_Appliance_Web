@@ -554,8 +554,8 @@ function startWSS() {
         document.getElementById('als-tog').checked = alsEnabled;
         buildLangGrid();
         // Load attend iframe
-        const iUrl = `https://attend.wordly.ai/frame/${cfg.sessionId}?bgcolor=0D0C0C&fgcolor=ffffff&finalOnly=true${cfg.passcode?'&key='+encodeURIComponent(cfg.passcode):''}`;
-        document.getElementById('s-iframe').src = iUrl;
+        const iUrl = `https://attend.wordly.ai/frame/${cfg.sessionId}?bgcolor=0D0C0C&fgcolor=ffffff${cfg.passcode?'&key='+encodeURIComponent(cfg.passcode):''}`;
+        setTimeout(() => { document.getElementById('s-iframe').src = iUrl; }, 1000);
         // Send start
         // Use session's default language from connect response for first start
         const startLang = d.languageCode || currentLang || 'en';

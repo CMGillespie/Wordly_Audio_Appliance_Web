@@ -192,7 +192,7 @@ input:checked + .tog-slide:before { transform: translateX(20px); }
   </div>
   <div class="sactions">
     <button id="btn-mute" onclick="toggleMute()">MUTE</button>
-    <iframe id="s-iframe" class="s-iframe" src="about:blank" allow="autoplay" sandbox="allow-scripts allow-popups"></iframe>
+    <iframe id="s-iframe" class="s-iframe" src="about:blank" allow="autoplay" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
     <div class="sbot">
       <button id="btn-split" onclick="confirm2('Split transcript?\nAudio continues uninterrupted.', doSplit)">✂ SPLIT</button>
       <button id="btn-leave" onclick="confirm2('Leave session?\nAttendees remain connected.', doLeave)">⤴ LEAVE</button>

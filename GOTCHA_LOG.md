@@ -135,4 +135,37 @@ def _confirm_callback(self):
 
 ---
 
-*Last updated: July 2, 2026 — Phase 1 POC complete*
+*Last updated: August 12, 2026 — Phase 2 pure browser build*
+
+---
+
+## GOTCHA #14 — ALS (Auto Language Selection) — How It Actually Works
+
+**What it is:** Wordly's dynamic language detection. Runs continuously during a session, detecting what language the speaker is actually using.
+
+**The rules:**
+
+1. **Connect response `languageCode`** = the session's configured starting language. Use this to set initial state and highlight the corresponding button in the UI.
+
+2. **ALS status messages** — when ALS is active, Wordly continuously sends WSS status messages containing the currently detected `languageCode`. When ALS is on, always update the active language display to match these messages.
+
+3. **Quick switch buttons** — send a language hint to Wordly (`stop` + `start` with new `languageCode`, ALS flag still `enabled: true`). If Wordly's ASR agrees with the selection, the next status message will confirm it and the button stays highlighted. If Wordly disagrees (e.g. you picked Spanish but speaker is actually Portuguese), the status message overrides and corrects the display.
+
+4. **ALS off** — the session was pre-configured with a fixed language. Quick switch is law. Status messages may or may not continue — behavior unclear. Ignore any language updates from status messages when ALS is off.
+
+5. **Never disable `dynamicLanguageSelection`** when doing a quick switch — pass `enabled: true` always unless the user has explicitly toggled ALS off in the UI.
+
+6. **ALS latency** — takes 1-2 sentences to detect a language change. Quick switch lets the operator anticipate and speed up the transition manually. Useful when you can see the next speaker approaching.
+
+**Languages where ALS is not supported:**
+Some languages have `detectability: false` in `https://assets.wordly.ai/language-config/languages.json`. For these languages, ALS cannot auto-detect — the session must be pre-configured or manually switched. Check the `detectability` flag when building language selection UI.
+
+**The pain point — Spanglish and Franglais:**
+Mixed-language speech (Spanish/English, French/English) causes rapid ALS flipping between languages. The ASR cannot keep up with mid-sentence language switches. No fix — this is a Wordly ASR limitation.
+
+**Session configurations to expect in the field:**
+- ALS on, single source language configured → ALS detects and switches
+- ALS off, single source language configured → fixed language, no auto-detection
+- ALS on, multiple languages in session → ALS arbitrates, quick switch hints
+
+**Source:** Field testing, Chris Gillespie, `languages.json` at Wordly CDN

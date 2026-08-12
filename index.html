@@ -573,7 +573,7 @@ function startWSS() {
         if(!d.success){showErr(d.message||'Connection rejected.');return;}
         sessionLangs=d.languageCodes||[];
         alsEnabled=(d.dynamicLanguageSelection?.enabled!==false);
-        currentLang='en';
+        currentLang=d.languageCode||'en';
         document.getElementById('als-tog').checked=alsEnabled;
         buildLangGrid();
         // Load iframe 1s after connect to avoid blocking audio

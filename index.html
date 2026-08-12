@@ -74,15 +74,15 @@ select { width: 100%; padding: 13px 16px; background: #060E1A; border: 1px solid
 /* ══ STREAMING ══ */
 #screen-streaming { flex-direction: row; }
 .sinfo { width: 380px; flex-shrink: 0; background: #162540; display: flex; flex-direction: column; padding: 16px 16px 12px 20px; border-right: 3px solid #2E7D32; }
-.si-sid    { font-family: monospace; font-size: 28px; font-weight: 900; color: #FFF; margin-bottom: 2px; letter-spacing: 2px; }
-.si-title  { font-size: 13px; color: #7AAAD5; margin-bottom: 6px; font-style: italic; min-height: 16px; }
+.si-label  { font-size: 26px; font-weight: 900; color: #FFF; margin-bottom: 2px; line-height: 1.1; min-height: 32px; }
+.si-sid    { font-family: monospace; font-size: 16px; color: #5A8AAA; margin-bottom: 4px; letter-spacing: 1px; }
 .si-status { font-size: 40px; font-weight: 900; color: #FFF; line-height: 1; margin-bottom: 4px; }
 .si-timer  { font-family: monospace; font-size: 30px; font-weight: bold; color: #55CCFF; margin-bottom: 10px; }
 
 /* Language quick switch */
 .ls-label { font-size: 11px; color: #5A8AAA; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; font-weight: bold; }
 .ls-grid  { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; margin-bottom: 8px; }
-.ls-btn   { padding: 10px 6px; font-size: 13px; font-weight: bold; background: #1B3A6B; color: #88AACC; border: 1px solid #2A5298; border-radius: 5px; cursor: pointer; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ls-btn   { padding: 12px 6px; font-size: 14px; font-weight: bold; background: #1B3A6B; color: #88AACC; border: 1px solid #2A5298; border-radius: 6px; cursor: pointer; text-align: center; line-height: 1.2; word-break: break-word; white-space: normal; }
 .ls-btn.active { background: #2A6DB5; color: #FFF; border-color: #5AA0E9; }
 .ls-btn:active { opacity: 0.8; }
 .als-row  { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; }
@@ -105,7 +105,7 @@ input:checked + .tog-slide:before { transform: translateX(20px); }
 #btn-mute  { flex: 1; background: #2E8A36; color: #FFF; border: 3px solid #44BB55; border-radius: 10px; font-size: 52px; font-weight: 900; cursor: pointer; letter-spacing: 3px; box-shadow: inset 0 -6px 0 rgba(0,0,0,0.3); }
 #btn-mute:active { box-shadow: none; }
 #btn-mute.muted { background: #0D2B0D; color: #66AA66; border-color: #2A6A2A; font-size: 42px; }
-.s-iframe  { height: 140px; flex-shrink: 0; border: none; border-radius: 8px; background: #000; }
+.s-iframe  { width: 100%; height: 100%; border: none; display: block; }
 .sbot { display: flex; gap: 8px; height: 80px; flex-shrink: 0; }
 #btn-split { flex: 1; background: #0D4A0D; color: #66EE66; border: 2px solid #2A7A2A; border-radius: 8px; font-size: 22px; font-weight: bold; cursor: pointer; }
 #btn-split.flash { background: #1E7A1E; color: #FFF; }
@@ -169,8 +169,8 @@ input:checked + .tog-slide:before { transform: translateX(20px); }
 <!-- STREAMING -->
 <div id="screen-streaming" class="screen">
   <div class="sinfo">
-    <div class="si-sid"    id="si-sid">—</div>
-    <div class="si-title"  id="si-title"></div>
+    <div class="si-label"  id="si-label"></div>
+    <div class="si-sid"    id="si-sid" style="font-size:16px;color:#5A8AAA;margin-bottom:6px">—</div>
     <div class="si-status" id="si-status">● LIVE</div>
     <div class="si-timer"  id="si-timer">00:00:00</div>
     <div style="margin-bottom:6px">
@@ -191,7 +191,7 @@ input:checked + .tog-slide:before { transform: translateX(20px); }
   </div>
   <div class="sactions">
     <button id="btn-mute" onclick="toggleMute()">MUTE</button>
-    <iframe id="s-iframe" class="s-iframe" src="about:blank" allow="autoplay" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
+    <div style="height:140px;flex-shrink:0;background:#000;border-radius:8px;overflow:hidden"><iframe id="s-iframe" class="s-iframe" src="about:blank" allow="autoplay" sandbox="allow-scripts allow-same-origin allow-popups" style="width:100%;height:100%;border:none;display:block"></iframe></div>
     <div class="sbot">
       <button id="btn-split" onclick="confirm2('Split transcript?\nAudio continues uninterrupted.', doSplit)">✂ SPLIT</button>
       <button id="btn-leave" onclick="confirm2('Leave session?\nAttendees remain connected.', doLeave)">⤴ LEAVE</button>
@@ -338,7 +338,8 @@ function loadIdle() {
   subEl.textContent = cfg.presenter || (sid ? '' : 'Use Wordly Session Config below.');
   subEl.style.color = cfg.presenter ? '#7AAAD5' : '#3A6A9A';
   document.getElementById('card-dev').textContent = cfg.deviceLabel ? '🎙 '+cfg.deviceLabel : '';
-  document.getElementById('si-sid').textContent   = sid || '—';
+  document.getElementById('si-label').textContent = cfg.roomLabel || sid || '—';
+  document.getElementById('si-sid').textContent   = cfg.roomLabel ? sid : '';
   const online = navigator.onLine;
   const netEl  = document.getElementById('net-line');
   netEl.textContent = online ? '🌐 Network connected' : '🌐 No network connection';
@@ -399,6 +400,8 @@ async function buildWordlyPanel() {
       <input type="password" id="w-pass" value="${cfg.passcode||''}" placeholder="Session passcode">
       <button class="pw-tog" onclick="togPw()">Show</button>
     </div>
+    <span class="fl">Room / Session Label (shown on display)</span>
+    <input type="text" id="w-room" value="${cfg.roomLabel||''}" placeholder="e.g. Main Hall, Room 3">
     <span class="fl">Presenter / Speaker Name</span>
     <input type="text" id="w-pres" value="${cfg.presenter||''}">
     <span class="fl">Audio Input Device</span>
@@ -452,6 +455,7 @@ function saveWordly() {
   const sel=document.getElementById('w-dev');
   cfg.sessionId  = sid;
   cfg.passcode   = pass || parsedPass;
+  cfg.roomLabel  = document.getElementById('w-room').value.trim();
   cfg.presenter  = document.getElementById('w-pres').value.trim();
   cfg.deviceId   = sel.value;
   cfg.deviceLabel= sel.options[sel.selectedIndex]?.text || '';

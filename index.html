@@ -81,8 +81,8 @@ select { width: 100%; padding: 13px 16px; background: #060E1A; border: 1px solid
 
 /* Language quick switch */
 .ls-label { font-size: 11px; color: #5A8AAA; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; font-weight: bold; }
-.ls-grid  { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 8px; }
-.ls-btn   { padding: 7px 4px; font-size: 11px; font-weight: bold; background: #1B3A6B; color: #88AACC; border: 1px solid #2A5298; border-radius: 5px; cursor: pointer; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ls-grid  { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; margin-bottom: 8px; }
+.ls-btn   { padding: 10px 6px; font-size: 13px; font-weight: bold; background: #1B3A6B; color: #88AACC; border: 1px solid #2A5298; border-radius: 5px; cursor: pointer; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ls-btn.active { background: #2A6DB5; color: #FFF; border-color: #5AA0E9; }
 .ls-btn:active { opacity: 0.8; }
 .als-row  { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; }
@@ -102,15 +102,15 @@ input:checked + .tog-slide:before { transform: translateX(20px); }
 
 /* Right panel */
 .sactions { flex: 1; background: #1A6020; display: flex; flex-direction: column; padding: 10px; gap: 8px; }
-#btn-mute  { height: 80px; flex-shrink: 0; background: #2E8A36; color: #FFF; border: 3px solid #44BB55; border-radius: 10px; font-size: 32px; font-weight: 900; cursor: pointer; }
-#btn-mute:active { background: #3A9A42; }
-#btn-mute.muted { background: #0D2B0D; color: #66AA66; border-color: #2A6A2A; }
-.s-iframe  { flex: 1; border: none; border-radius: 8px; min-height: 0; }
-.sbot { display: flex; gap: 8px; height: 70px; flex-shrink: 0; }
-#btn-split { flex: 1; background: #0D4A0D; color: #66EE66; border: 2px solid #2A7A2A; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
+#btn-mute  { flex: 1; background: #2E8A36; color: #FFF; border: 3px solid #44BB55; border-radius: 10px; font-size: 52px; font-weight: 900; cursor: pointer; letter-spacing: 3px; box-shadow: inset 0 -6px 0 rgba(0,0,0,0.3); }
+#btn-mute:active { box-shadow: none; }
+#btn-mute.muted { background: #0D2B0D; color: #66AA66; border-color: #2A6A2A; font-size: 42px; }
+.s-iframe  { height: 140px; flex-shrink: 0; border: none; border-radius: 8px; background: #000; }
+.sbot { display: flex; gap: 8px; height: 80px; flex-shrink: 0; }
+#btn-split { flex: 1; background: #0D4A0D; color: #66EE66; border: 2px solid #2A7A2A; border-radius: 8px; font-size: 22px; font-weight: bold; cursor: pointer; }
 #btn-split.flash { background: #1E7A1E; color: #FFF; }
-#btn-leave { flex: 1; background: #1A2A50; color: #88AADD; border: 2px solid #2A4A80; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
-#btn-end   { flex: 1; background: #550000; color: #FFAAAA; border: 2px solid #880000; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
+#btn-leave { flex: 1; background: #1A2A50; color: #88AADD; border: 2px solid #2A4A80; border-radius: 8px; font-size: 22px; font-weight: bold; cursor: pointer; }
+#btn-end   { flex: 1; background: #550000; color: #FFAAAA; border: 2px solid #880000; border-radius: 8px; font-size: 22px; font-weight: bold; cursor: pointer; }
 
 @keyframes muted-pulse { 0%,100%{opacity:1} 50%{opacity:0.2} }
 #screen-streaming.muted { animation: muted-pulse 2.0s ease-in-out infinite; }
@@ -174,15 +174,15 @@ input:checked + .tog-slide:before { transform: translateX(20px); }
     <div class="si-status" id="si-status">● LIVE</div>
     <div class="si-timer"  id="si-timer">00:00:00</div>
     <div style="margin-bottom:6px">
-      <div class="ls-label">QUICK SWITCH</div>
-      <div class="ls-grid" id="ls-grid"></div>
-      <div class="als-row">
+      <div class="als-row" style="margin-bottom:8px">
         <span class="als-lbl">Auto-detect language</span>
         <label class="tog-wrap">
           <input type="checkbox" id="als-tog" onchange="setAls(this.checked)" checked>
           <span class="tog-slide"></span>
         </label>
       </div>
+      <div class="ls-label">QUICK SWITCH</div>
+      <div class="ls-grid" id="ls-grid"></div>
     </div>
     <div class="meter-wrap">
       <div class="meter-label">AUDIO LEVEL</div>
@@ -469,20 +469,19 @@ function buildLangGrid() {
     const name = langNames[code] || code;
     // Truncate to fit button
     const label = name.length > 10 ? name.slice(0,9)+'…' : name;
-    return `<button class="ls-btn ${code===currentLang&&!alsEnabled?'active':''}" onclick="switchLang('${code}')">${label}</button>`;
+    return `<button class="ls-btn ${code===currentLang?'active':''}" onclick="switchLang('${code}')">${label}</button>`;
   }).join('');
 }
 function switchLang(code) {
   currentLang = code;
   cfg.lastLang = code;
   saveCfg();
-  // Disable ALS when manually selecting
-  alsEnabled = false;
-  document.getElementById('als-tog').checked = false;
+  // Keep ALS enabled — quick switch just hints the language preference
+  // Wordly will auto-switch back if it detects a different language
   buildLangGrid();
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({type:'stop'}));
-    ws.send(JSON.stringify({type:'start', languageCode:code, sampleRate:SAMPLE_RATE, dynamicLanguageSelection:{enabled:false}}));
+    ws.send(JSON.stringify({type:'start', languageCode:code, sampleRate:SAMPLE_RATE, dynamicLanguageSelection:{enabled:alsEnabled}}));
   }
 }
 function setAls(enabled) {

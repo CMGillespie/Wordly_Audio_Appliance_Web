@@ -573,7 +573,7 @@ function startWSS() {
         if(!d.success){showErr(d.message||'Connection rejected.');return;}
         sessionLangs=d.languageCodes||[];
         alsEnabled=(d.dynamicLanguageSelection?.enabled!==false);
-        currentLang=d.languageCode||'en';
+        currentLang=''; // will be set from start response
         document.getElementById('als-tog').checked=alsEnabled;
         buildLangGrid();
         // Load iframe 1s after connect to avoid blocking audio
@@ -582,6 +582,7 @@ function startWSS() {
         ws.send(JSON.stringify({type:'start',languageCode:'en',sampleRate:TARGET_SAMPLE_RATE,dynamicLanguageSelection:{enabled:alsEnabled}}));
       } else if(d.type==='status'&&d.action==='start'){
         if(d.success){
+          if(d.languageCode) { currentLang=d.languageCode; buildLangGrid(); }
           connected=true;
           document.getElementById('si-status').textContent='● LIVE';
           if(!timerStart) startTimer();

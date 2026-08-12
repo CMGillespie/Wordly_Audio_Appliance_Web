@@ -82,7 +82,7 @@ select { width: 100%; padding: 13px 16px; background: #060E1A; border: 1px solid
 /* Language quick switch */
 .ls-label { font-size: 11px; color: #5A8AAA; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; font-weight: bold; }
 .ls-grid  { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; margin-bottom: 8px; }
-.ls-btn   { padding: 14px 8px; font-size: 15px; font-weight: bold; background: #1B3A6B; color: #88AACC; border: 1px solid #2A5298; border-radius: 6px; cursor: pointer; text-align: center; line-height: 1.2; word-break: break-word; white-space: normal; }
+.ls-btn   { padding: 10px 6px; font-size: 12px; font-weight: bold; background: #1B3A6B; color: #88AACC; border: 1px solid #2A5298; border-radius: 6px; cursor: pointer; text-align: center; line-height: 1.3; word-break: break-word; white-space: normal; min-height: 48px; display:flex; align-items:center; justify-content:center; }
 .ls-btn.active { background: #2A6DB5; color: #FFF; border-color: #5AA0E9; }
 .ls-btn:active { opacity: 0.8; }
 .als-row  { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; }
@@ -265,7 +265,7 @@ let cdTimer     = null;
 let muted       = false;
 let connected   = false;
 let intentional = false;
-let currentLang = cfg.lastLang || 'en';
+let currentLang = 'en';
 let alsEnabled  = true;
 let sessionLangs= [];
 let langNames   = {};  // wordlyCode -> englishName, fetched from Wordly
@@ -472,7 +472,7 @@ function buildLangGrid() {
   grid.innerHTML = langs.map(code => {
     const name = langNames[code] || code;
     // Truncate to fit button
-    const label = name.length > 14 ? name.slice(0,13)+'…' : name;
+    const label = name;
     return `<button class="ls-btn ${code===currentLang?'active':''}" onclick="switchLang('${code}')">${label}</button>`;
   }).join('');
 }
@@ -564,7 +564,10 @@ function startWSS() {
         const iUrl = `https://attend.wordly.ai/frame/${cfg.sessionId}?bgcolor=0D0C0C&fgcolor=ffffff&finalOnly=true${cfg.passcode?'&key='+encodeURIComponent(cfg.passcode):''}`;
         document.getElementById('s-iframe').src = iUrl;
         // Send start
-        ws.send(JSON.stringify({type:'start', languageCode:currentLang, sampleRate:SAMPLE_RATE, dynamicLanguageSelection:{enabled:alsEnabled}}));
+        // Use session's default language from connect response for first start
+        const startLang = d.languageCode || currentLang || 'en';
+        currentLang = startLang;
+        ws.send(JSON.stringify({type:'start', languageCode:startLang, sampleRate:SAMPLE_RATE, dynamicLanguageSelection:{enabled:alsEnabled}}));
       } else if (d.type === 'status' && d.action === 'start') {
         if (d.success) {
           connected = true;
@@ -621,7 +624,7 @@ function showErr(msg) {
 // ═══════════════════════════════════════════════════════════
 async function startSession() {
   if (document.getElementById('btn-start').classList.contains('disabled')) return;
-  muted=false; intentional=false; connected=false;
+  muted=false; intentional=false; connected=false; currentLang='en';
   document.getElementById('screen-streaming').classList.remove('muted');
   document.getElementById('btn-mute').textContent='MUTE';
   document.getElementById('btn-mute').classList.remove('muted');

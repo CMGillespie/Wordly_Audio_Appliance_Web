@@ -73,27 +73,52 @@
 
   /* ══ STREAMING ══ */
   #screen-streaming { flex-direction: row; }
-  .stream-info { width: 420px; flex-shrink: 0; background: #162540; display: flex; flex-direction: column; padding: 20px 20px 16px 24px; border-right: 3px solid #2E7D32; }
-  .s-badge  { font-family: monospace; font-size: 40px; font-weight: 900; color: #FFF; display: block; margin-bottom: 8px; letter-spacing: 2px; }
-  .s-status { font-size: 64px; font-weight: 900; color: #FFF; line-height: 1; margin-bottom: 8px; }
-  .s-timer  { font-family: monospace; font-size: 44px; font-weight: bold; color: #55CCFF; margin-bottom: auto; }
-  .meter-wrap { margin-top: 14px; }
-  .meter-label { font-size: 12px; color: #7AAACC; margin-bottom: 5px; letter-spacing: 1px; font-weight: bold; }
-  .meter-track { width: 100%; height: 24px; background: #060E1A; border-radius: 12px; overflow: hidden; border: 2px solid #1B3A6B; }
-  .meter-fill  { height: 100%; background: linear-gradient(90deg, #00FF88, #00CCFF); width: 0%; border-radius: 12px; transition: width 0.08s; }
-  .stream-actions { flex: 1; background: #1A6020; display: flex; flex-direction: column; padding: 14px; gap: 10px; }
-  #btn-mute { flex: 1; background: #2E8A36; color: #FFF; border: 3px solid #44BB55; border-radius: 12px; font-size: 44px; font-weight: 900; cursor: pointer; letter-spacing: 2px; box-shadow: inset 0 -4px 0 rgba(0,0,0,0.3); }
-  #btn-mute:active { box-shadow: none; }
-  #btn-mute.muted { background: #0D2B0D; color: #66AA66; border-color: #2A6A2A; font-size: 36px; }
-  .stream-bot { display: flex; gap: 10px; height: 120px; flex-shrink: 0; }
-  #btn-split { flex: 1; background: #0D4A0D; color: #66EE66; border: 2px solid #2A7A2A; border-radius: 10px; font-size: 24px; font-weight: bold; cursor: pointer; }
-  #btn-split.flash { background: #1E7A1E; color: #FFF; }
-  #btn-leave { flex: 1; background: #1A2A50; color: #88AADD; border: 2px solid #2A4A80; border-radius: 10px; font-size: 24px; font-weight: bold; cursor: pointer; }
-  #btn-end   { flex: 1; background: #550000; color: #FFAAAA; border: 2px solid #880000; border-radius: 10px; font-size: 24px; font-weight: bold; cursor: pointer; }
 
-  /* mute pulse */
-  @keyframes muted-pulse { 0%,100%{opacity:1} 50%{opacity:0.45} }
-  #screen-streaming.muted { animation: muted-pulse 2.4s ease-in-out infinite; }
+  /* Left info panel */
+  .stream-info { width: 380px; flex-shrink: 0; background: #162540; display: flex; flex-direction: column; padding: 16px 16px 12px 20px; border-right: 3px solid #2E7D32; }
+  .s-badge  { font-family: monospace; font-size: 30px; font-weight: 900; color: #FFF; display: block; margin-bottom: 2px; letter-spacing: 2px; }
+  .s-title  { font-size: 14px; color: #7AAAD5; margin-bottom: 6px; font-style: italic; min-height: 18px; }
+  .s-status { font-size: 44px; font-weight: 900; color: #FFF; line-height: 1; margin-bottom: 4px; }
+  .s-timer  { font-family: monospace; font-size: 32px; font-weight: bold; color: #55CCFF; margin-bottom: 10px; }
+
+  /* Language quick switch */
+  .lang-section { margin-top: 4px; }
+  .lang-label { font-size: 11px; color: #5A8AAA; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; font-weight: bold; }
+  .lang-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 8px; }
+  .lang-btn { padding: 8px 4px; font-size: 12px; font-weight: bold; background: #1B3A6B; color: #88AACC; border: 1px solid #2A5298; border-radius: 6px; cursor: pointer; text-align: center; }
+  .lang-btn.active { background: #2A6DB5; color: #FFF; border-color: #5AA0E9; }
+  .lang-btn:active { background: #3A7DC5; }
+  .auto-row { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+  .auto-label { font-size: 12px; color: #7AAACC; }
+  .toggle-wrap { position: relative; width: 44px; height: 24px; cursor: pointer; }
+  .toggle-wrap input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider { position: absolute; inset: 0; background: #1B3A6B; border-radius: 24px; transition: 0.3s; }
+  .toggle-slider:before { content: ''; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: #FFF; border-radius: 50%; transition: 0.3s; }
+  input:checked + .toggle-slider { background: #2A6DB5; }
+  input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+  /* Meter */
+  .meter-wrap { margin-top: auto; }
+  .meter-label { font-size: 11px; color: #7AAACC; margin-bottom: 4px; letter-spacing: 1px; font-weight: bold; }
+  .meter-track { width: 100%; height: 20px; background: #060E1A; border-radius: 10px; overflow: hidden; border: 2px solid #1B3A6B; }
+  .meter-fill  { height: 100%; background: linear-gradient(90deg, #00FF88, #00CCFF); width: 0%; border-radius: 10px; transition: width 0.08s; }
+
+  /* Right action panel */
+  .stream-actions { flex: 1; background: #1A6020; display: flex; flex-direction: column; padding: 10px; gap: 8px; }
+  .stream-iframe { flex: 1; border: none; border-radius: 8px; background: #000; width: 100%; display: block; }
+  .stream-mid { display: flex; gap: 8px; height: 60px; flex-shrink: 0; }
+  #btn-mute { flex: 1; background: #2E8A36; color: #FFF; border: 3px solid #44BB55; border-radius: 10px; font-size: 28px; font-weight: 900; cursor: pointer; }
+  #btn-mute:active { background: #3A9A42; }
+  #btn-mute.muted { background: #0D2B0D; color: #66AA66; border-color: #2A6A2A; }
+  .stream-bot { display: flex; gap: 8px; height: 70px; flex-shrink: 0; }
+  #btn-split { flex: 1; background: #0D4A0D; color: #66EE66; border: 2px solid #2A7A2A; border-radius: 8px; font-size: 20px; font-weight: bold; cursor: pointer; }
+  #btn-split.flash { background: #1E7A1E; color: #FFF; }
+  #btn-leave { flex: 1; background: #1A2A50; color: #88AADD; border: 2px solid #2A4A80; border-radius: 8px; font-size: 20px; font-weight: bold; cursor: pointer; }
+  #btn-end   { flex: 1; background: #550000; color: #FFAAAA; border: 2px solid #880000; border-radius: 8px; font-size: 20px; font-weight: bold; cursor: pointer; }
+
+  /* mute pulse — whole screen */
+  @keyframes muted-pulse { 0%,100%{opacity:1} 50%{opacity:0.2} }
+  #screen-streaming.muted { animation: muted-pulse 2.0s ease-in-out infinite; }
 
   /* ══ ERROR ══ */
   #screen-error { background: #3A0000; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 16px; padding: 30px; }
@@ -151,15 +176,30 @@
 <div id="screen-streaming" class="screen">
   <div class="stream-info">
     <div class="s-badge" id="s-badge">—</div>
+    <div class="s-title"  id="s-title"></div>
     <div class="s-status" id="s-status">● LIVE</div>
     <div class="s-timer"  id="s-timer">00:00:00</div>
+    <div class="lang-section">
+      <div class="lang-label">QUICK SWITCH</div>
+      <div class="lang-grid" id="lang-grid"></div>
+      <div class="auto-row">
+        <span class="auto-label">Auto-detect language</span>
+        <label class="toggle-wrap">
+          <input type="checkbox" id="auto-lang-toggle" onchange="toggleAutoLang(this.checked)" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
     <div class="meter-wrap">
       <div class="meter-label">AUDIO LEVEL</div>
       <div class="meter-track"><div class="meter-fill" id="meter-fill"></div></div>
     </div>
   </div>
   <div class="stream-actions">
-    <button id="btn-mute" onclick="toggleMute()">MUTE</button>
+    <iframe id="stream-iframe" class="stream-iframe" src="about:blank" allow="autoplay"></iframe>
+    <div class="stream-mid">
+      <button id="btn-mute" onclick="toggleMute()">MUTE</button>
+    </div>
     <div class="stream-bot">
       <button id="btn-split" onclick="confirmAction('Split transcript now?\nAudio continues uninterrupted.', doSplit)">✂ SPLIT</button>
       <button id="btn-leave" onclick="confirmAction('Leave session?\nAttendees remain connected.', doLeave)">⤴ LEAVE</button>
@@ -224,17 +264,21 @@ function saveCfg() { localStorage.setItem('wordly_cfg', JSON.stringify(cfg)); }
 // ═══════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════
-let ws           = null;
-let audioCtx     = null;
-let mediaStream  = null;
-let processor    = null;
-let muted        = false;
-let timerInt     = null;
-let timerStart   = null;
-let cdInt        = null;
-let cdVal        = 60;
-let connected    = false;
-let intentionalEnd = false;  // set before sending disconnect to suppress portal-end handler
+let ws              = null;
+let audioCtx        = null;
+let mediaStream     = null;
+let processor       = null;
+let muted           = false;
+let timerInt        = null;
+let timerStart      = null;
+let cdInt           = null;
+let cdVal           = 60;
+let connected       = false;
+let intentionalEnd  = false;
+let currentLang     = 'en';
+let availableLangs  = [];
+let autoLang        = true;
+let sessionTitle    = '';
 
 // ═══════════════════════════════════════════════════════════════
 // HELPERS
@@ -529,7 +573,7 @@ function startWSS() {
       if (data.type === 'status' && data.action === 'connect') {
         if (data.success) {
           // Send start
-          ws.send(JSON.stringify({type:'start', languageCode:'en', sampleRate:SAMPLE_RATE}));
+          ws.send(JSON.stringify({type:'start', languageCode: currentLang, sampleRate:SAMPLE_RATE, dynamicLanguageSelection:{enabled: autoLang}}));
         } else {
           showError(data.message || 'Connection rejected by Wordly.');
         }
@@ -580,6 +624,46 @@ function showError(msg) {
 // ═══════════════════════════════════════════════════════════════
 // SESSION CONTROLS
 // ═══════════════════════════════════════════════════════════════
+// ── LANGUAGE FUNCTIONS ──────────────────────────────────────────────────────
+const LANG_NAMES = {
+  'ar':'Arabic','zh-CN':'Chinese (Si...','en':'English (US)','fr':'French (FR)',
+  'de':'German','ja':'Japanese','ko':'Korean','es':'Spanish (ES)',
+  'pt':'Portuguese','it':'Italian','ru':'Russian','hi':'Hindi',
+  'nl':'Dutch','pl':'Polish','tr':'Turkish','vi':'Vietnamese',
+  'th':'Thai','id':'Indonesian','sv':'Swedish','da':'Danish'
+};
+
+function buildLangGrid() {
+  const grid = document.getElementById('lang-grid');
+  if (!grid) return;
+  const langs = availableLangs.slice(0, 8);
+  grid.innerHTML = langs.map(code => {
+    const name = LANG_NAMES[code] || code;
+    return `<button class="lang-btn ${code === currentLang ? 'active' : ''}" onclick="switchLang('${code}')">${name}</button>`;
+  }).join('');
+}
+
+function switchLang(code) {
+  currentLang = code;
+  buildLangGrid();
+  if (ws && ws.readyState === WebSocket.OPEN && connected) {
+    ws.send(JSON.stringify({type:'stop'}));
+    setTimeout(() => {
+      ws.send(JSON.stringify({type:'start', languageCode: code, sampleRate:SAMPLE_RATE, dynamicLanguageSelection:{enabled: autoLang}}));
+    }, 150);
+  }
+}
+
+function toggleAutoLang(enabled) {
+  autoLang = enabled;
+  if (ws && ws.readyState === WebSocket.OPEN && connected) {
+    ws.send(JSON.stringify({type:'stop'}));
+    setTimeout(() => {
+      ws.send(JSON.stringify({type:'start', languageCode: currentLang, sampleRate:SAMPLE_RATE, dynamicLanguageSelection:{enabled: autoLang}}));
+    }, 150);
+  }
+}
+
 async function startSession() {
   if (document.getElementById('btn-start').classList.contains('disabled')) return;
   muted = false;
@@ -602,7 +686,7 @@ function toggleMute() {
   if (muted) {
     muted = false;
     if (ws && ws.readyState === WebSocket.OPEN)
-      ws.send(JSON.stringify({type:'start', languageCode:'en', sampleRate:SAMPLE_RATE}));
+      ws.send(JSON.stringify({type:'start', languageCode: currentLang, sampleRate:SAMPLE_RATE, dynamicLanguageSelection:{enabled: autoLang}}));
     document.getElementById('s-status').textContent = '● LIVE';
     document.getElementById('screen-streaming').classList.remove('muted');
     document.getElementById('btn-mute').textContent = 'MUTE';
@@ -631,6 +715,7 @@ function doSplit() {
 
 function doLeave() {
   stopAudio(); stopTimer();
+  document.getElementById('stream-iframe').src = 'about:blank';
   wssClose(false);
   ws = null; connected = false;
   returnToIdle();
@@ -638,6 +723,7 @@ function doLeave() {
 
 function doEnd() {
   stopAudio(); stopTimer();
+  document.getElementById('stream-iframe').src = 'about:blank';
   connected = false;
   intentionalEnd = true;
   if (ws && ws.readyState === WebSocket.OPEN) {

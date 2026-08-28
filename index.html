@@ -99,6 +99,16 @@ input:checked + .tog-slide:before { transform: translateX(20px); }
 .ls-btn.active { background: #2A6DB5; color: #FFF; border-color: #5AA0E9; box-shadow: 0 0 0 2px #5AA0E9; }
 .ls-btn:active { opacity: 0.8; }
 
+/* Caption launch pill */
+.cap-pill {
+  display: inline-block; padding: 5px 14px;
+  font-size: 11px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;
+  background: #1B3A6B; color: #88AACC;
+  border: 1px solid #2A5298; border-radius: 20px;
+  cursor: pointer; margin-bottom: 8px; transition: background 0.15s;
+}
+.cap-pill.fired { background: #2A6DB5; color: #FFF; }
+
 /* Meter */
 .meter-wrap  { margin-top: auto; padding-top: 8px; }
 .meter-label { font-size: 11px; color: #7AAACC; margin-bottom: 4px; letter-spacing: 1px; font-weight: bold; }
@@ -197,6 +207,7 @@ input:checked + .tog-slide:before { transform: translateX(20px); }
     </div>
     <div class="ls-label">QUICK SWITCH</div>
     <div class="ls-grid" id="ls-grid"></div>
+    <button class="cap-pill" id="cap-pill" onclick="launchCaptions()">⛶ Caption Screen</button>
     <div class="meter-wrap">
       <div class="meter-label">AUDIO LEVEL</div>
       <div class="meter-track"><div class="meter-fill" id="meter-fill"></div></div>
@@ -473,6 +484,16 @@ function saveWordly() {
 // ═══════════════════════════════════════
 // LANGUAGE GRID
 // ═══════════════════════════════════════
+function launchCaptions() {
+  const sid = cfg.sessionId || '';
+  if (!sid) return;
+  const url = `https://cmgillespie.github.io/Wordly_iframe_landing/?session=${sid}&kiosk=1`;
+  window.open(url, '_blank', 'width=1920,height=1080');
+  const btn = document.getElementById('cap-pill');
+  btn.classList.add('fired');
+  setTimeout(() => btn.classList.remove('fired'), 1000);
+}
+
 function buildLangGrid() {
   const grid=document.getElementById('ls-grid'); if(!grid) return;
   const langs=sessionLangs.slice(0,8);

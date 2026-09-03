@@ -17,6 +17,17 @@ html, body {
 .screen { position: fixed; inset: 0; display: none; }
 .screen.active { display: flex; }
 
+/* ── PORTRAIT MODE ── */
+body.portrait {
+  transform: rotate(90deg);
+  transform-origin: center center;
+  width: 100vh;
+  height: 100vw;
+  position: fixed;
+  top: calc((100vh - 100vw) / 2);
+  left: calc((100vw - 100vh) / 2);
+}
+
 /* ── PANEL ── */
 #panel { position: fixed; inset: 0; background: #0D1B2E; z-index: 100; display: none; flex-direction: column; }
 #panel.open { display: flex; }
@@ -376,6 +387,12 @@ function loadIdle() {
 // ═══════════════════════════════════════
 // PANELS
 // ═══════════════════════════════════════
+function toggleOrientation() {
+  const p = document.body.classList.toggle('portrait');
+  localStorage.setItem('wordly_portrait', p ? '1' : '0');
+  buildWordlyPanel();
+}
+
 function openPanel(w) { document.getElementById('panel').classList.add('open'); w==='network' ? buildNetPanel() : buildWordlyPanel(); }
 function closePanel() { document.getElementById('panel').classList.remove('open'); loadIdle(); }
 
@@ -430,7 +447,13 @@ async function buildWordlyPanel() {
     <select id="w-dev">${devOpts}</select>
     <div class="msg" id="w-msg" style="margin-top:12px"></div>
     <button class="btn-test" onclick="testAudio()">Test Audio (2s)</button>`;
-  document.getElementById('panel-foot').innerHTML = `<button class="btn-save" onclick="saveWordly()">✓ Save & Close</button>`;
+  const p = document.body.classList.contains('portrait');
+  document.getElementById('panel-foot').innerHTML = `
+    <div style="margin-bottom:10px;display:flex;align-items:center;gap:10px">
+      <span style="font-size:12px;color:#5A8AAA;font-weight:bold;text-transform:uppercase">ORIENTATION</span>
+      <button onclick="toggleOrientation()" style="padding:7px 16px;background:${p?'#2A6DB5':'#1B3A6B'};color:#FFF;border:none;border-radius:20px;font-size:13px;font-weight:bold;cursor:pointer">${p?'⬛ Portrait':'▬ Landscape'}</button>
+    </div>
+    <button class="btn-save" onclick="saveWordly()">✓ Save & Close</button>`;
 
   document.getElementById('w-link').addEventListener('input', e => {
     const {sid,pass}=parseLink(e.target.value);
@@ -742,6 +765,7 @@ function returnToIdle(){cancelCd();intentional=false;loadIdle();showScreen('idle
 // ═══════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════
+if (localStorage.getItem('wordly_portrait') === '1') document.body.classList.add('portrait');
 loadIdle();
 window.addEventListener('online',loadIdle);
 window.addEventListener('offline',loadIdle);

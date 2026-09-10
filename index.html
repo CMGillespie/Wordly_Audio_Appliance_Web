@@ -873,8 +873,10 @@ function returnToIdle(){cancelCd();// stopReason reset on returnToIdle
 // INIT
 // ═══════════════════════════════════════
 // Apply saved orientation on load
-if (localStorage.getItem('wordly_portrait') === '1') {
+const _savedPortrait = localStorage.getItem('wordly_portrait');
+if (_savedPortrait === '1' || (_savedPortrait === null && window.innerHeight > window.innerWidth)) {
   document.body.classList.add('portrait');
+  if (_savedPortrait === null) localStorage.setItem('wordly_portrait', '1');
 }
 loadIdle();
 window.addEventListener('online',loadIdle);

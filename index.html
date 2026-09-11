@@ -185,7 +185,7 @@ body.portrait .ls-grid        { grid-template-columns: repeat(4, 1fr); gap: 4px;
 body.portrait .ls-btn         { padding: 8px 4px; font-size: 12px; min-height: 36px; }
 body.portrait .meter-wrap     { margin-top: 6px; }
 body.portrait .sactions       { flex: 1; }
-body.portrait #btn-mute       { font-size: 20px; }
+body.portrait #btn-mute       { font-size: 48px; }
 body.portrait .iframe-wrap    { height: 300px; }
 body.portrait .sbot           { height: 60px; }
 body.portrait #btn-split, body.portrait #btn-leave, body.portrait #btn-end { font-size: 16px; }
@@ -692,7 +692,7 @@ function startWSS() {
         document.getElementById('als-tog').checked=alsEnabled;
         buildLangGrid();
         // Load iframe 1s after connect to avoid blocking audio
-        const iUrl=`https://attend.wordly.ai/frame/${cfg.sessionId}?fgsize=40px${cfg.passcode?'&key='+encodeURIComponent(cfg.passcode):''}`;
+        const iUrl=`https://attend.wordly.ai/frame/${cfg.sessionId}?fgsize=40px&showScrollbar=false${cfg.passcode?'&key='+encodeURIComponent(cfg.passcode):''}`;
         setTimeout(()=>{document.getElementById('s-iframe').src=iUrl;},1000);
         ws.send(JSON.stringify({type:'start',languageCode:'en',sampleRate:TARGET_SAMPLE_RATE,dynamicLanguageSelection:{enabled:alsEnabled}}));
       } else if(d.type==='status'&&d.action==='start'){

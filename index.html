@@ -692,7 +692,7 @@ function startWSS() {
         document.getElementById('als-tog').checked=alsEnabled;
         buildLangGrid();
         // Load iframe 1s after connect to avoid blocking audio
-        const iUrl=`https://attend.wordly.ai/frame/${cfg.sessionId}?fgsize=60px${cfg.passcode?'&key='+encodeURIComponent(cfg.passcode):''}`;
+        const iUrl=`https://attend.wordly.ai/frame/${cfg.sessionId}?fgsize=40px${cfg.passcode?'&key='+encodeURIComponent(cfg.passcode):''}`;
         setTimeout(()=>{document.getElementById('s-iframe').src=iUrl;},1000);
         ws.send(JSON.stringify({type:'start',languageCode:'en',sampleRate:TARGET_SAMPLE_RATE,dynamicLanguageSelection:{enabled:alsEnabled}}));
       } else if(d.type==='status'&&d.action==='start'){

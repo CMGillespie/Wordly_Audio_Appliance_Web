@@ -539,7 +539,7 @@ function saveWordly() {
 function launchCaptions() {
   const sid = cfg.sessionId || '';
   if (!sid) return;
-  const url = `https://cmgillespie.github.io/Wordly_iframe_landing/?session=${sid}&kiosk=1`;
+  const url = `https://cmgillespie.github.io/Wordly_iframe_landing/?session=${sid}&kiosk=1&fgsize=60px`;
   window.open(url, '_blank', 'width=1920,height=1080');
   const btn = document.getElementById('cap-pill');
   btn.classList.add('fired');

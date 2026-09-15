@@ -101,6 +101,20 @@ input:checked + .tog-slide:before { transform: translateX(20px); }
 .ls-btn.active { background: #2A6DB5; color: #FFF; border-color: #5AA0E9; box-shadow: 0 0 0 2px #5AA0E9; }
 .ls-btn:active { opacity: 0.8; }
 
+
+/* Schedule pill */
+.sched-pill {
+  font-size: 11px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;
+  background: #1B3A6B; color: #88AACC;
+  border: 1px solid #2A5298; border-radius: 20px;
+  padding: 5px 14px; margin-bottom: 8px;
+  display: none;
+}
+.sched-pill.active { display: inline-block; }
+.sched-pill.warn   { display: inline-block; background: #7A5000; color: #FFB300; border-color: #FFB300; }
+.sched-pill.urgent { display: inline-block; background: #7A5000; color: #FFB300; border-color: #FFB300;
+  animation: pulse-amber 0.6s ease-in-out infinite alternate; }
+@keyframes pulse-amber { from { opacity:1; } to { opacity:0.4; } }
 /* Caption launch pill */
 .cap-pill {
   display: inline-block; padding: 5px 14px;
@@ -235,6 +249,7 @@ body.portrait #btn-split, body.portrait #btn-leave, body.portrait #btn-end { fon
     </div>
     <div class="ls-label">QUICK SWITCH</div>
     <div class="ls-grid" id="ls-grid"></div>
+    <div class="sched-pill" id="sched-pill"></div>
     <button class="cap-pill" id="cap-pill" onclick="launchCaptions()">⛶ Caption Screen</button>
     <div class="meter-wrap">
       <div class="meter-label">AUDIO LEVEL</div>
@@ -481,7 +496,25 @@ async function buildWordlyPanel() {
     <span class="fl">Audio Input Device</span>
     <select id="w-dev">${devOpts}</select>
     <div class="msg" id="w-msg" style="margin-top:12px"></div>
-    <button class="btn-test" onclick="testAudio()">Test Audio (2s)</button>`;
+    <button class="btn-test" onclick="testAudio()">Test Audio (2s)</button>
+    <span class="fl" style="margin-top:16px">Schedule (optional — 24hr window)</span>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <input type="checkbox" id="s-start-en">
+        <label style="color:#7AAACC;font-size:12px;width:40px">START</label>
+        <input type="time" id="s-start-t" style="background:#060E1A;color:#CDE;border:1px solid #1B3A6B;border-radius:6px;padding:4px 8px;font-size:14px">
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <input type="checkbox" id="s-split-en">
+        <label style="color:#7AAACC;font-size:12px;width:40px">SPLIT</label>
+        <input type="time" id="s-split-t" style="background:#060E1A;color:#CDE;border:1px solid #1B3A6B;border-radius:6px;padding:4px 8px;font-size:14px">
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <input type="checkbox" id="s-end-en">
+        <label style="color:#7AAACC;font-size:12px;width:40px">END</label>
+        <input type="time" id="s-end-t" style="background:#060E1A;color:#CDE;border:1px solid #1B3A6B;border-radius:6px;padding:4px 8px;font-size:14px">
+      </div>
+    </div>`;
   document.getElementById('panel-foot').innerHTML = `<button class="btn-save" onclick="saveWordly()">✓ Save & Close</button>`;
 
   document.getElementById('w-link').addEventListener('input', e => {
@@ -518,6 +551,71 @@ async function testAudio() {
     document.getElementById('w-dev').innerHTML=devs.map(d=>`<option value="${d.deviceId}" ${d.deviceId===cfg.deviceId?'selected':''}>${d.label||'Mic '+d.deviceId.slice(0,6)}</option>`).join('');
   } catch(e){msg.textContent='✗ '+e.message;msg.className='msg err';}
 }
+
+// ═══════════════════════════════════════
+// LOCAL SCHEDULER
+// ═══════════════════════════════════════
+const schedTimers = { start: null, split: null, end: null };
+let schedPillInterval = null;
+
+function msUntil(hhmm) {
+  if (!hhmm) return null;
+  const [h, m] = hhmm.split(':').map(Number);
+  const now = new Date();
+  const target = new Date(now);
+  target.setHours(h, m, 0, 0);
+  if (target <= now) target.setDate(target.getDate() + 1);
+  return target - now;
+}
+
+function clearSchedule() {
+  Object.keys(schedTimers).forEach(k => {
+    if (schedTimers[k]) { clearTimeout(schedTimers[k]); schedTimers[k] = null; }
+  });
+  if (schedPillInterval) { clearInterval(schedPillInterval); schedPillInterval = null; }
+  updateSchedPill();
+}
+
+function armSchedule() {
+  clearSchedule();
+  if (cfg.schedStart) schedTimers.start = setTimeout(() => {
+    if (!document.getElementById('btn-start')?.classList.contains('disabled')) startSession();
+  }, msUntil(cfg.schedStart));
+  if (cfg.schedSplit) schedTimers.split = setTimeout(() => {
+    if (ws && ws.readyState === WebSocket.OPEN) doSplit();
+  }, msUntil(cfg.schedSplit));
+  if (cfg.schedEnd) schedTimers.end = setTimeout(() => {
+    if (ws && ws.readyState === WebSocket.OPEN) wssStop('user', true);
+  }, msUntil(cfg.schedEnd));
+  if (cfg.schedStart || cfg.schedSplit || cfg.schedEnd) {
+    schedPillInterval = setInterval(updateSchedPill, 1000);
+    updateSchedPill();
+  }
+}
+
+function nextSchedEntry() {
+  const entries = [
+    { label: 'START', time: cfg.schedStart },
+    { label: 'SPLIT', time: cfg.schedSplit },
+    { label: 'END',   time: cfg.schedEnd   },
+  ].filter(e => e.time).map(e => ({ ...e, ms: msUntil(e.time) }));
+  if (!entries.length) return null;
+  return entries.sort((a,b) => a.ms - b.ms)[0];
+}
+
+function updateSchedPill() {
+  const pill = document.getElementById('sched-pill');
+  if (!pill) return;
+  const next = nextSchedEntry();
+  if (!next) { pill.className = 'sched-pill'; pill.textContent = ''; return; }
+  const totalSec = Math.round(next.ms / 1000);
+  const m = Math.floor(totalSec / 60), s = totalSec % 60;
+  pill.textContent = `${next.label} in ${m}:${String(s).padStart(2,'0')}`;
+  if (totalSec <= 30)       pill.className = 'sched-pill urgent';
+  else if (totalSec <= 120) pill.className = 'sched-pill warn';
+  else                      pill.className = 'sched-pill active';
+}
+
 function saveWordly() {
   const linkVal=document.getElementById('w-link').value.trim();
   const {sid:parsedSid,pass:parsedPass}=parseLink(linkVal);
@@ -530,7 +628,11 @@ function saveWordly() {
   cfg.presenter=document.getElementById('w-pres').value.trim();
   cfg.deviceId=sel.value;
   cfg.deviceLabel=sel.options[sel.selectedIndex]?.text||'';
+  cfg.schedStart = document.getElementById('s-start-en')?.checked ? document.getElementById('s-start-t').value : '';
+  cfg.schedSplit = document.getElementById('s-split-en')?.checked ? document.getElementById('s-split-t').value : '';
+  cfg.schedEnd   = document.getElementById('s-end-en')?.checked   ? document.getElementById('s-end-t').value   : '';
   saveCfg(); closePanel();
+  armSchedule();
 }
 
 // ═══════════════════════════════════════

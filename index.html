@@ -249,7 +249,7 @@ body.portrait #btn-split, body.portrait #btn-leave, body.portrait #btn-end { fon
     </div>
     <div class="ls-label">QUICK SWITCH</div>
     <div class="ls-grid" id="ls-grid"></div>
-    <div class="sched-pill" id="sched-pill"></div>
+    <div style="display:inline-flex;align-items:center;gap:6px"><div class="sched-pill" id="sched-pill"></div><button id="sched-cancel" onclick="cancelSchedule()" style="display:none;background:none;border:none;color:#FFB300;font-size:14px;cursor:pointer;padding:0">✕</button></div>
     <button class="cap-pill" id="cap-pill" onclick="launchCaptions()">⛶ Caption Screen</button>
     <div class="meter-wrap">
       <div class="meter-label">AUDIO LEVEL</div>
@@ -580,12 +580,15 @@ function armSchedule() {
   clearSchedule();
   if (cfg.schedStart) schedTimers.start = setTimeout(() => {
     if (!document.getElementById('btn-start')?.classList.contains('disabled')) startSession();
+    cfg.schedStart=''; saveCfg(); updateSchedPill();
   }, msUntil(cfg.schedStart));
   if (cfg.schedSplit) schedTimers.split = setTimeout(() => {
     if (ws && ws.readyState === WebSocket.OPEN) doSplit();
+    cfg.schedSplit=''; saveCfg(); updateSchedPill();
   }, msUntil(cfg.schedSplit));
   if (cfg.schedEnd) schedTimers.end = setTimeout(() => {
-    if (ws && ws.readyState === WebSocket.OPEN) wssStop('user', true);
+    if (ws && ws.readyState === WebSocket.OPEN) { stopAudio(); stopTimer(); wssStop('user'); wssDisconnect(true); showScreen('idle'); }
+    cfg.schedEnd=''; saveCfg(); updateSchedPill();
   }, msUntil(cfg.schedEnd));
   if (cfg.schedStart || cfg.schedSplit || cfg.schedEnd) {
     schedPillInterval = setInterval(updateSchedPill, 1000);
@@ -603,11 +606,18 @@ function nextSchedEntry() {
   return entries.sort((a,b) => a.ms - b.ms)[0];
 }
 
+function cancelSchedule() {
+  cfg.schedStart=''; cfg.schedSplit=''; cfg.schedEnd='';
+  saveCfg(); clearSchedule();
+}
+
 function updateSchedPill() {
   const pill = document.getElementById('sched-pill');
   if (!pill) return;
   const next = nextSchedEntry();
-  if (!next) { pill.className = 'sched-pill'; pill.textContent = ''; return; }
+  const cancelBtn = document.getElementById('sched-cancel');
+  if (!next) { pill.className = 'sched-pill'; pill.textContent = ''; if(cancelBtn) cancelBtn.style.display='none'; return; }
+  if(cancelBtn) cancelBtn.style.display='inline';
   const totalSec = Math.round(next.ms / 1000);
   const m = Math.floor(totalSec / 60), s = totalSec % 60;
   pill.textContent = `${next.label} in ${m}:${String(s).padStart(2,'0')}`;

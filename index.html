@@ -438,6 +438,9 @@ function toggleOrientation() {
 function openPanel(w) { document.getElementById('panel').classList.add('open'); w==='network' ? buildNetPanel() : buildWordlyPanel(); }
 function closePanel() { document.getElementById('panel').classList.remove('open'); loadIdle(); }
 
+function isLegBuild() {
+  return typeof firebase !== 'undefined';
+}
 function buildNetPanel() {
   document.getElementById('panel-title').textContent = '🌐 Network';
   const ok = navigator.onLine;
@@ -453,6 +456,14 @@ function buildNetPanel() {
       <button class="btn-test" onclick="testNet()">Test Connection</button>
     </div>`;
   const isPortrait = document.body.classList.contains('portrait');
+  const isLocked = !!cfg.cloudLockout;
+  const lockoutHtml = isLegBuild() ? `
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px">
+      <span style="font-size:13px;color:#5A8AAA;font-weight:bold;text-transform:uppercase;letter-spacing:0.5px">CLOUD CONTROL</span>
+      <button onclick="toggleCloudLockout()" style="padding:8px 18px;background:${isLocked?'#B5352A':'#1B3A6B'};color:#FFF;border:none;border-radius:20px;font-size:14px;font-weight:bold;cursor:pointer">
+        ${isLocked ? '🔒 Locked (tap to allow cloud control)' : '🔓 Unlocked (tap to lock out cloud control)'}
+      </button>
+    </div>` : '';
   document.getElementById('panel-foot').innerHTML = `
     <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px">
       <span style="font-size:13px;color:#5A8AAA;font-weight:bold;text-transform:uppercase;letter-spacing:0.5px">ORIENTATION</span>
@@ -460,7 +471,13 @@ function buildNetPanel() {
         ${isPortrait ? '⬛ Portrait (tap for Landscape)' : '▬ Landscape (tap for Portrait)'}
       </button>
     </div>
+    ${lockoutHtml}
     <button class="btn-save" onclick="saveNet()">✓ Save & Close</button>`;
+}
+function toggleCloudLockout() {
+  cfg.cloudLockout = !cfg.cloudLockout;
+  saveCfg();
+  buildNetPanel();
 }
 async function testNet() {
   const el=document.getElementById('test-msg'); el.textContent='Testing...'; el.className='msg';
@@ -480,23 +497,7 @@ async function buildWordlyPanel() {
     devOpts=devs.map(d=>`<option value="${d.deviceId}" ${d.deviceId===cfg.deviceId?'selected':''}>${d.label||'Mic '+d.deviceId.slice(0,6)}</option>`).join('');
   } catch(e) {}
 
-  document.getElementById('panel-body').innerHTML = `
-    <span class="fl">Session ID or Join Link</span>
-    <input type="text" id="w-link" value="${cfg.sessionId||''}" placeholder="Paste join link or ABCD-1234">
-    <div class="hint" id="w-hint">Paste a join link or type session ID directly.</div>
-    <span class="fl">Session ID</span>
-    <input type="text" id="w-sid" value="${cfg.sessionId||''}" placeholder="ABCD-1234" style="font-family:monospace;font-size:24px;font-weight:bold;letter-spacing:3px">
-    <span class="fl">Passcode</span>
-    <div class="pw-wrap">
-      <input type="password" id="w-pass" value="${cfg.passcode||''}" placeholder="Session passcode">
-      <button class="pw-tog" onclick="togPw()">Show</button>
-    </div>
-    <span class="fl">Presenter / Speaker Name</span>
-    <input type="text" id="w-pres" value="${cfg.presenter||''}">
-    <span class="fl">Audio Input Device</span>
-    <select id="w-dev">${devOpts}</select>
-    <div class="msg" id="w-msg" style="margin-top:12px"></div>
-    <button class="btn-test" onclick="testAudio()">Test Audio (2s)</button>
+  const schedHtml = isLegBuild() ? '' : `
     <span class="fl" style="margin-top:16px">Schedule (optional — 24hr window)</span>
     <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
       <div style="display:flex;align-items:center;gap:10px">
@@ -515,6 +516,24 @@ async function buildWordlyPanel() {
         <input type="time" id="s-end-t" style="background:#060E1A;color:#CDE;border:1px solid #1B3A6B;border-radius:6px;padding:4px 8px;font-size:14px">
       </div>
     </div>`;
+  document.getElementById('panel-body').innerHTML = `
+    <span class="fl">Session ID or Join Link</span>
+    <input type="text" id="w-link" value="${cfg.sessionId||''}" placeholder="Paste join link or ABCD-1234">
+    <div class="hint" id="w-hint">Paste a join link or type session ID directly.</div>
+    <span class="fl">Session ID</span>
+    <input type="text" id="w-sid" value="${cfg.sessionId||''}" placeholder="ABCD-1234" style="font-family:monospace;font-size:24px;font-weight:bold;letter-spacing:3px">
+    <span class="fl">Passcode</span>
+    <div class="pw-wrap">
+      <input type="password" id="w-pass" value="${cfg.passcode||''}" placeholder="Session passcode">
+      <button class="pw-tog" onclick="togPw()">Show</button>
+    </div>
+    <span class="fl">Presenter / Speaker Name</span>
+    <input type="text" id="w-pres" value="${cfg.presenter||''}">
+    <span class="fl">Audio Input Device</span>
+    <select id="w-dev">${devOpts}</select>
+    <div class="msg" id="w-msg" style="margin-top:12px"></div>
+    <button class="btn-test" onclick="testAudio()">Test Audio (2s)</button>
+    ${schedHtml}`;
   document.getElementById('panel-foot').innerHTML = `<button class="btn-save" onclick="saveWordly()">✓ Save & Close</button>`;
 
   document.getElementById('w-link').addEventListener('input', e => {

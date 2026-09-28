@@ -670,7 +670,7 @@ function saveWordly() {
 function launchCaptions() {
   const sid = cfg.sessionId || '';
   if (!sid) return;
-  const url = `https://cmgillespie.github.io/Wordly_iframe_landing/?session=${sid}&kiosk=1&fgsize=60px`;
+  const url = `https://cmgillespie.github.io/Wordly_iframe_landing/?session=${sid}&kiosk=1&fgsize=60px&language=${currentLang}`;
   window.open(url, '_blank', 'width=1920,height=1080');
   const btn = document.getElementById('cap-pill');
   btn.classList.add('fired');
@@ -819,19 +819,19 @@ function startWSS() {
         }
         sessionLangs=d.languageCodes||[];
         alsEnabled=(d.dynamicLanguageSelection?.enabled!==false);
-        currentLang='en';
+        currentLang='';
         document.getElementById('als-tog').checked=alsEnabled;
         buildLangGrid();
-        // Load iframe 1s after connect to avoid blocking audio
-        const iUrl=`https://attend.wordly.ai/frame/${cfg.sessionId}?fgsize=40px&showScrollbar=false${cfg.passcode?'&key='+encodeURIComponent(cfg.passcode):''}`;
-        setTimeout(()=>{document.getElementById('s-iframe').src=iUrl;},1000);
-        ws.send(JSON.stringify({type:'start',languageCode:'en',sampleRate:TARGET_SAMPLE_RATE,dynamicLanguageSelection:{enabled:alsEnabled}}));
+        ws.send(JSON.stringify({type:'start',languageCode:currentLang||'en',sampleRate:TARGET_SAMPLE_RATE,dynamicLanguageSelection:{enabled:alsEnabled}}));
       } else if(d.type==='status'&&d.action==='start'){
         if(d.success){
           connected=true;
+          if(d.languageCode) { currentLang=d.languageCode; buildLangGrid(); }
           document.getElementById('si-status').textContent='● LIVE';
           if(!timerStart) startTimer();
           echoTimer=setInterval(()=>{if(ws&&ws.readyState===WebSocket.OPEN)ws.send(JSON.stringify({type:'echo'}));},ECHO_MS);
+          const iUrl=`https://attend.wordly.ai/frame/${cfg.sessionId}?fgsize=30px&showScrollbar=false&language=${currentLang}${cfg.passcode?'&key='+encodeURIComponent(cfg.passcode):''}`;
+          setTimeout(()=>{document.getElementById('s-iframe').src=iUrl;},1000);
         }
       } else if(d.type==='status'){
         if(d.languageCode&&alsEnabled){currentLang=d.languageCode;buildLangGrid();}

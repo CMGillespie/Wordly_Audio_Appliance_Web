@@ -488,13 +488,34 @@ async function testNet() {
 }
 function saveNet() { cfg.wifiSsid=document.getElementById('net-ssid').value.trim(); saveCfg(); closePanel(); }
 
+// ── v3.1a START mic auto-pick: saved device first, else most likely external mic ──
+const MIC_BUILTIN=/built-?in|internal|microphone array|macbook|intel|realtek|hdmi|smart sound|monitor/i;
+const MIC_LOWPRI=/bluetooth|airpods|webcam|camera|brio|c9\d\d/i;
+async function getMicList(){
+  let devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='audioinput');
+  if(devs.some(d=>!d.label)){
+    try{(await navigator.mediaDevices.getUserMedia({audio:true})).getTracks().forEach(t=>t.stop());}catch(e){}
+    devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='audioinput');
+  }
+  return devs;
+}
+function resolveMic(devs){
+  const real=devs.filter(d=>d.deviceId&&d.deviceId!=='default'&&d.deviceId!=='communications');
+  const saved=real.find(d=>d.deviceId===cfg.deviceId)||(cfg.deviceLabel&&real.find(d=>d.label===cfg.deviceLabel));
+  if(saved) return saved;
+  const ext=real.filter(d=>d.label&&!MIC_BUILTIN.test(d.label));
+  return ext.find(d=>!MIC_LOWPRI.test(d.label))||ext[0]||null;
+}
+function micPreselect(devs){const m=resolveMic(devs);return m?m.deviceId:(cfg.deviceId||'');}
+// ── v3.1a STOP ──
+
 async function buildWordlyPanel() {
   document.getElementById('panel-title').textContent = '🎙 Wordly Session Config';
   let devOpts = '<option value="">Select device</option>';
   try {
     await navigator.mediaDevices.getUserMedia({audio:true}).then(s=>s.getTracks().forEach(t=>t.stop()));
     const devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='audioinput');
-    devOpts=devs.map(d=>`<option value="${d.deviceId}" ${d.deviceId===cfg.deviceId?'selected':''}>${d.label||'Mic '+d.deviceId.slice(0,6)}</option>`).join('');
+    devOpts=devs.map(d=>`<option value="${d.deviceId}" ${d.deviceId===micPreselect(devs)?'selected':''}>${d.label||'Mic '+d.deviceId.slice(0,6)}</option>`).join('');
   } catch(e) {}
 
   const schedHtml = isLegBuild() ? '' : `
@@ -567,7 +588,7 @@ async function testAudio() {
     if (peak<0.02){msg.textContent='⚠ No signal.';msg.className='msg err';}
     else{msg.textContent=`✓ Signal: ${(peak*100).toFixed(0)}%`;msg.className='msg ok';}
     const devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='audioinput');
-    document.getElementById('w-dev').innerHTML=devs.map(d=>`<option value="${d.deviceId}" ${d.deviceId===cfg.deviceId?'selected':''}>${d.label||'Mic '+d.deviceId.slice(0,6)}</option>`).join('');
+    document.getElementById('w-dev').innerHTML=devs.map(d=>`<option value="${d.deviceId}" ${d.deviceId===micPreselect(devs)?'selected':''}>${d.label||'Mic '+d.deviceId.slice(0,6)}</option>`).join('');
   } catch(e){msg.textContent='✗ '+e.message;msg.className='msg err';}
 }
 
@@ -720,10 +741,12 @@ function f32ToI16(f32) {
 }
 
 async function startAudio() {
-  const constraints=cfg.deviceId
-    ?{audio:{deviceId:{exact:cfg.deviceId},channelCount:1,echoCancellation:false,noiseSuppression:false,autoGainControl:false}}
-    :{audio:{channelCount:1,echoCancellation:false,noiseSuppression:false,autoGainControl:false}};
-  stream=await navigator.mediaDevices.getUserMedia(constraints);
+  const mics=await getMicList();
+  const pick=resolveMic(mics);
+  const base={channelCount:1,echoCancellation:false,noiseSuppression:false,autoGainControl:false};
+  stream=await navigator.mediaDevices.getUserMedia({audio:pick?{...base,deviceId:{exact:pick.deviceId}}:base});
+  if(pick&&(pick.deviceId!==cfg.deviceId||pick.label!==cfg.deviceLabel)){cfg.deviceId=pick.deviceId;cfg.deviceLabel=pick.label;saveCfg();}
+  if(!pick){const r=document.getElementById('si-room');if(r)r.textContent='⚠ No external mic found - using system default';}
   audioCtx=new AudioContext();
   const nativeRate=audioCtx.sampleRate;
   const src=audioCtx.createMediaStreamSource(stream);

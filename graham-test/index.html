@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=800, initial-scale=1.0, user-scalable=no">
+<meta name="color-scheme" content="light dark">
+<title>Wordly Presenter</title>
+<script>
+/* Apply saved appearance before first paint: 'light' | 'dark' | (unset = match system) */
+try { const t = localStorage.getItem('wordly_theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20227%20227%22%3E%3Cpath%20fill%3D%22%23017CFF%22%20d%3D%22M113.44%200C50.79%200%20.56%2055%201.32%20110.25c.75%2055.24%2012.23%2047.94%2012.23%2074.56C13.55%20211.43%200%20226.88%200%20226.88s13.36-9.95%2038.57-9.95%2013.87%209.95%2074.85%209.95%20113.46-50.8%20113.46-113.45C226.88%2050.79%20176.09%200%20113.44%200Z%22/%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M186.26%2094.93l5.3-20.21h-9.26c-14.4%200-27%209.74-30.66%2023.68l-11.5%2044.04-16.8-67.72H102.5l-16.73%2067.46-11.45-43.76c-3.65-13.94-16.24-23.68-30.65-23.68h-9.03l5.3%2020.2h3.73c5.22%200%209.8%203.53%2011.12%208.6l17.76%2068.32h23.44l16.93-65.18%2016.93%2065.18h23.44l17.89-68.31c1.32-5.05%205.9-8.6%2011.12-8.6h3.96Z%22/%3E%3C/svg%3E">
+<style>
+/* ══════════════════════════════════════════════════════════════
+   Wordly Presenter: Wordly design system, Light + Dark modes.
+   Semantic tokens mirror the Figma "All variables" collection
+   (semantic/color/*). Icons: Lucide, inlined as masks.
+══════════════════════════════════════════════════════════════ */
+:root {
+  color-scheme: light;
+  /* Brand constants (same in both modes) */
+  --brand: #017CFF;
+  --ribbon: linear-gradient(90deg, #3CFF52 0%, #00D0FF 51%, #017CFF 100%);
+  --font: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  --mono: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --page: #F8F9FA;
+  --card: #FFFFFF;
+  --card-border: #E3E6E8;
+  --raised: #F8F9FA;
+  --border: #E3E6E8;
+  --border-strong: #CDD2D7;
+  --divider: #EEF0F2;
+  --text: #121416;
+  --text-2: #343A40;
+  --text-3: #646E78;
+  --text-disabled: #646E78;
+  --primary: #0063CC;
+  --primary-active: #0051A8;
+  --on-primary: #FFFFFF;
+  --primary-tint: #F0F7FF;
+  --primary-text: #00458F;
+  --primary-border: #B2D8FF;
+  --focus: #0063CC;
+  --focus-halo: #D6E8FF;
+  --link: #2563EB;
+  --link-hover: #1E40AF;
+  --input-bg: #FFFFFF;
+  --input-border: #CDD2D7;
+  --track: #EEF0F2;
+  --toggle-off: #CDD2D7;
+  --disabled-veil: rgba(255,255,255,0.85);
+  --live-bg: #0A7B3F;
+  --live-text: #FFFFFF;
+  --muted-bg: #C2410C;
+  --muted-text: #FFFFFF;
+  --live-active: #085D2F;
+  --success-text: #0A7B3F;
+  --success-bg: #E6F6EC;
+  --success-border: #C5E8D2;
+  --error-text: #B8221A;
+  --error-bg: #FCEBEA;
+  --error-border: #F9CFCC;
+  --danger-bg: #B8221A;
+  --on-danger: #FFFFFF;
+  --danger-hover: #8A1A13;
+  --danger-active: #5C110D;
+  --error-solid: #E62D21;
+  --warning-text: #C2410C;
+  --warning-bg: #FFF6EB;
+  --warning-border: #FDBA74;
+  --info-text: #1E3FAE;
+  --info-bg: #EBF5FF;
+  --info-border: #B2D8FF;
+  --overlay: rgba(18,20,22,0.5);
+  --soft-gradient: linear-gradient(135deg, #D6E8FF 0%, #FFFFFF 50%, #DAF8E5 100%);
+  --logo: #017CFF;
+  --chip-bg: #FFFFFF;
+  --chip-border: #CDD2D7;
+  --chip-x-bg: #EEF0F2;
+  --chip-x: #000000;
+  --info-text-chip: #1E40AF;
+  --sel-bg: #DAF8E5;
+  --ended-bg: #F1FDF5;
+  --ribbon-opacity: 1;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.06), 0 8px 16px rgba(0,0,0,0.08);
+  --shadow-xl: 0 20px 40px rgba(0,99,204,0.15);
+  --chevron: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%23646E78%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27m6%209%206%206%206-6%27/%3E%3C/svg%3E");
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #121416;
+  --card: #1A1D21;
+  --card-border: rgba(255,255,255,0.16);
+  --raised: #21252B;
+  --border: rgba(255,255,255,0.16);
+  --border-strong: #495057;
+  --divider: #343A40;
+  --text: #F0F2F4;
+  --text-2: #CDD2D7;
+  --text-3: #9BA3AB;
+  --text-disabled: #9BA3AB;
+  --primary: #3396FF;
+  --primary-active: #75B8FF;
+  --on-primary: #000C1A;
+  --primary-tint: #001E3D;
+  --primary-text: #75B8FF;
+  --primary-border: rgba(51,150,255,0.5);
+  --focus: #3396FF;
+  --focus-halo: rgba(51,150,255,0.35);
+  --link: #84C5FF;
+  --link-hover: #B3D4FF;
+  --input-bg: #21252B;
+  --input-border: #9BA3AB;
+  --track: #282D35;
+  --toggle-off: #495057;
+  --disabled-veil: rgba(26,29,33,0.85);
+  --live-bg: #34AD67;
+  --live-text: #021F10;
+  --muted-bg: #FB923C;
+  --muted-text: #2E1B10;
+  --live-active: #66C188;
+  --success-text: #66C188;
+  --success-bg: #021F10;
+  --success-border: #34AD67;
+  --error-text: #F07870;
+  --error-bg: #2E0906;
+  --error-border: #E62D21;
+  --danger-bg: #F07870;
+  --on-danger: #121416;
+  --danger-hover: #F5A8A2;
+  --danger-active: #F9CFCC;
+  --error-solid: #F07870;
+  --warning-text: #FDBA74;
+  --warning-bg: #7C2D12;
+  --warning-border: #FB923C;
+  --info-text: #B3D4FF;
+  --info-bg: #1E2F60;
+  --info-border: #53B1FD;
+  --overlay: rgba(0,0,0,0.7);
+  --soft-gradient: linear-gradient(135deg, #0F2540 0%, #121416 50%, #12291A 100%);
+  --logo: #FFFFFF;
+  --chip-bg: #121416;
+  --chip-border: #9BA3AB;
+  --chip-x-bg: #212529;
+  --chip-x: #F0F2F4;
+  --info-text-chip: #B3D4FF;
+  --sel-bg: #12291A;
+  --ended-bg: #031708;
+  --ribbon-opacity: 0.9;
+  --shadow-sm: none;
+  --shadow-lg: none;
+  --shadow-xl: none;
+  --chevron: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%239BA3AB%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27m6%209%206%206%206-6%27/%3E%3C/svg%3E");
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+  color-scheme: dark;
+  --page: #121416;
+  --card: #1A1D21;
+  --card-border: rgba(255,255,255,0.16);
+  --raised: #21252B;
+  --border: rgba(255,255,255,0.16);
+  --border-strong: #495057;
+  --divider: #343A40;
+  --text: #F0F2F4;
+  --text-2: #CDD2D7;
+  --text-3: #9BA3AB;
+  --text-disabled: #9BA3AB;
+  --primary: #3396FF;
+  --primary-active: #75B8FF;
+  --on-primary: #000C1A;
+  --primary-tint: #001E3D;
+  --primary-text: #75B8FF;
+  --primary-border: rgba(51,150,255,0.5);
+  --focus: #3396FF;
+  --focus-halo: rgba(51,150,255,0.35);
+  --link: #84C5FF;
+  --link-hover: #B3D4FF;
+  --input-bg: #21252B;
+  --input-border: #9BA3AB;
+  --track: #282D35;
+  --toggle-off: #495057;
+  --disabled-veil: rgba(26,29,33,0.85);
+  --live-bg: #34AD67;
+  --live-text: #021F10;
+  --muted-bg: #FB923C;
+  --muted-text: #2E1B10;
+  --live-active: #66C188;
+  --success-text: #66C188;
+  --success-bg: #021F10;
+  --success-border: #34AD67;
+  --error-text: #F07870;
+  --error-bg: #2E0906;
+  --error-border: #E62D21;
+  --danger-bg: #F07870;
+  --on-danger: #121416;
+  --danger-hover: #F5A8A2;
+  --danger-active: #F9CFCC;
+  --error-solid: #F07870;
+  --warning-text: #FDBA74;
+  --warning-bg: #7C2D12;
+  --warning-border: #FB923C;
+  --info-text: #B3D4FF;
+  --info-bg: #1E2F60;
+  --info-border: #53B1FD;
+  --overlay: rgba(0,0,0,0.7);
+  --soft-gradient: linear-gradient(135deg, #0F2540 0%, #121416 50%, #12291A 100%);
+  --logo: #FFFFFF;
+  --chip-bg: #121416;
+  --chip-border: #9BA3AB;
+  --chip-x-bg: #212529;
+  --chip-x: #F0F2F4;
+  --info-text-chip: #B3D4FF;
+  --sel-bg: #12291A;
+  --ended-bg: #031708;
+  --ribbon-opacity: 0.9;
+  --shadow-sm: none;
+  --shadow-lg: none;
+  --shadow-xl: none;
+  --chevron: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%239BA3AB%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27m6%209%206%206%206-6%27/%3E%3C/svg%3E");
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%; height: 100vh; overflow: hidden;
+  font-family: var(--font); background: var(--page); color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+}
+button, input, select, textarea { font-family: inherit; color: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* ── Icons (Lucide, 2px stroke) ── */
+[class*="ic-"]::before, .net-line::before, .sched-pill::before {
+  content: ""; display: inline-block; flex-shrink: 0;
+  width: 1.1em; height: 1.1em; background-color: currentColor;
+  -webkit-mask: var(--icon) center / contain no-repeat; mask: var(--icon) center / contain no-repeat;
+}
+:root{--i-playbold:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 stroke=%22black%22 stroke-width=%223%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22%3E%3Cpolygon points=%226 3 20 12 6 21 6 3%22/%3E%3C/svg%3E");--i-split:url("data:image/svg+xml,%3Csvg width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cpath d=%22M14 12H16M2 12H4M20 12H22M3 23C3 22.7374 3.05173 17.4773 3.15224 17.2346C3.25275 16.992 3.40007 16.7715 3.58579 16.5858C3.7715 16.4001 3.99198 16.2528 4.23463 16.1522C4.47728 16.0517 4.73736 16 5 16H19C19.2626 16 19.5227 16.0517 19.7654 16.1522C20.008 16.2528 20.2285 16.4001 20.4142 16.5858C20.5999 16.7715 20.7472 16.992 20.8478 17.2346C20.9483 17.4773 21 22.7374 21 23M3 1V6C3 6.53043 3.21071 7.03914 3.58579 7.41421C3.96086 7.78929 4.46957 8 5 8H19C19.5304 8 20.0391 7.78929 20.4142 7.41421C20.7893 7.03914 21 6.53043 21 6V1M8 12H10%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 stroke=%22black%22/%3E%3C/svg%3E");--i-search:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22%3E%3Ccircle cx=%2211%22 cy=%2211%22 r=%228%22/%3E%3Cpath d=%22m21 21-4.3-4.3%22/%3E%3C/svg%3E");--i-languages:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22%3E%3Cpath d=%22m5 8 6 6%22/%3E%3Cpath d=%22m4 14 6-6 2-3%22/%3E%3Cpath d=%22M2 5h12%22/%3E%3Cpath d=%22M7 2h1%22/%3E%3Cpath d=%22m22 22-5-10-5 10%22/%3E%3Cpath d=%22M14 18h6%22/%3E%3C/svg%3E");--i-info:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%2210%22/%3E%3Cpath d=%22M12 16v-4%22/%3E%3Cpath d=%22M12 8h.01%22/%3E%3C/svg%3E");--i-popout:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22%3E%3Cpath d=%22M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6%22/%3E%3Cpath d=%22m21 3-9 9%22/%3E%3Cpath d=%22M15 3h6v6%22/%3E%3C/svg%3E");--i-alert:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22%3E%3Cpath d=%22m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3%22/%3E%3Cpath d=%22M12 9v4%22/%3E%3Cpath d=%22M12 17h.01%22/%3E%3C/svg%3E");--i-exit:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22%3E%3Cpath d=%22M10 12h11%22/%3E%3Cpath d=%22m17 16 4-4-4-4%22/%3E%3Cpath d=%22M21 6.344V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-1.344%22/%3E%3C/svg%3E");--i-settings:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22%3E%3Cpath d=%22M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z%22/%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%223%22/%3E%3C/svg%3E");--i-mic:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22%3E%3Cpath d=%22M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z%22/%3E%3Cpath d=%22M19 10v2a7 7 0 0 1-14 0v-2%22/%3E%3Cline x1=%2212%22 x2=%2212%22 y1=%2219%22 y2=%2222%22/%3E%3C/svg%3E");--i-micoff:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22%3E%3Cline x1=%222%22 x2=%2222%22 y1=%222%22 y2=%2222%22/%3E%3Cpath d=%22M18.89 13.23A7.12 7.12 0 0 0 19 12v-2%22/%3E%3Cpath d=%22M5 10v2a7 7 0 0 0 12 5%22/%3E%3Cpath d=%22M15 9.34V5a3 3 0 0 0-5.68-1.33%22/%3E%3Cpath d=%22M9 9v3a3 3 0 0 0 5.12 2.12%22/%3E%3Cline x1=%2212%22 x2=%2212%22 y1=%2219%22 y2=%2222%22/%3E%3C/svg%3E");--i-wifi:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22%3E%3Cpath d=%22M12 20h.01%22/%3E%3Cpath d=%22M2 8.82a15 15 0 0 1 20 0%22/%3E%3Cpath d=%22M5 12.859a10 10 0 0 1 14 0%22/%3E%3Cpath d=%22M8.5 16.429a5 5 0 0 1 7 0%22/%3E%3C/svg%3E");--i-wifioff:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22%3E%3Cpath d=%22M12 20h.01%22/%3E%3Cpath d=%22M8.5 16.429a5 5 0 0 1 7 0%22/%3E%3Cpath d=%22M5 12.859a10 10 0 0 1 5.17-2.69%22/%3E%3Cpath d=%22M19 12.859a10 10 0 0 0-2.007-1.523%22/%3E%3Cpath d=%22M2 8.82a15 15 0 0 1 4.177-2.643%22/%3E%3Cpath d=%22M22 8.82a15 15 0 0 0-11.288-3.764%22/%3E%3Cpath d=%22m2 2 20 20%22/%3E%3C/svg%3E");--i-play:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22%3E%3Cpolygon points=%226 3 20 12 6 21 6 3%22/%3E%3C/svg%3E");--i-square:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22%3E%3Crect width=%2218%22 height=%2218%22 x=%223%22 y=%223%22 rx=%222%22/%3E%3C/svg%3E");--i-scissors:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22%3E%3Ccircle cx=%226%22 cy=%226%22 r=%223%22/%3E%3Cpath d=%22M8.12 8.12 12 12%22/%3E%3Cpath d=%22M20 4 8.12 15.88%22/%3E%3Ccircle cx=%226%22 cy=%2218%22 r=%223%22/%3E%3Cpath d=%22M14.8 14.8 20 20%22/%3E%3C/svg%3E");--i-logout:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22%3E%3Cpath d=%22M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4%22/%3E%3Cpolyline points=%2216 17 21 12 16 7%22/%3E%3Cline x1=%2221%22 x2=%229%22 y1=%2212%22 y2=%2212%22/%3E%3C/svg%3E");--i-x:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22%3E%3Cpath d=%22M18 6 6 18%22/%3E%3Cpath d=%22m6 6 12 12%22/%3E%3C/svg%3E");--i-monitor:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22%3E%3Crect width=%2220%22 height=%2214%22 x=%222%22 y=%223%22 rx=%222%22/%3E%3Cline x1=%228%22 x2=%2216%22 y1=%2221%22 y2=%2221%22/%3E%3Cline x1=%2212%22 x2=%2212%22 y1=%2217%22 y2=%2221%22/%3E%3C/svg%3E");--i-check:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22%3E%3Cpath d=%22M20 6 9 17l-5-5%22/%3E%3C/svg%3E");--i-checkcircle:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%2210%22/%3E%3Cpath d=%22m9 12 2 2 4-4%22/%3E%3C/svg%3E");--i-clock:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%2210%22/%3E%3Cpolyline points=%2212 6 12 12 16 14%22/%3E%3C/svg%3E");--i-activity:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22%3E%3Cpath d=%22M22 12h-4l-3 9L9 3l-3 9H2%22/%3E%3C/svg%3E");--i-rotate:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22%3E%3Crect width=%2210%22 height=%2216%22 x=%227%22 y=%224%22 rx=%222%22/%3E%3Cpath d=%22M3 9v6%22/%3E%3Cpath d=%22M21 9v6%22/%3E%3C/svg%3E");--i-lock:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 stroke=%22black%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 fill=%22none%22%3E%3Crect width=%2218%22 height=%2211%22 x=%223%22 y=%2211%22 rx=%222%22 ry=%222%22/%3E%3Cpath d=%22M7 11V7a5 5 0 0 1 10 0v4%22/%3E%3C/svg%3E");}
+.ic-settings{--icon:var(--i-settings)}
+.ic-mic{--icon:var(--i-mic)}
+.ic-micoff{--icon:var(--i-micoff)}
+.ic-wifi{--icon:var(--i-wifi)}
+.ic-wifioff{--icon:var(--i-wifioff)}
+.ic-play{--icon:var(--i-play)}
+.ic-square{--icon:var(--i-square)}
+.ic-scissors{--icon:var(--i-scissors)}
+.ic-logout{--icon:var(--i-logout)}
+.ic-x{--icon:var(--i-x)}
+.ic-monitor{--icon:var(--i-monitor)}
+.ic-check{--icon:var(--i-check)}
+.ic-checkcircle{--icon:var(--i-checkcircle)}
+.ic-clock{--icon:var(--i-clock)}
+.ic-activity{--icon:var(--i-activity)}
+.ic-rotate{--icon:var(--i-rotate)}
+.ic-lock{--icon:var(--i-lock)}
+.ic-exit{--icon:var(--i-exit)}
+.ic-alert{--icon:var(--i-alert)}
+.ic-popout{--icon:var(--i-popout)}
+.ic-info{--icon:var(--i-info)}
+.ic-languages{--icon:var(--i-languages)}
+.ic-search{--icon:var(--i-search)}
+.ic-split{--icon:var(--i-split)}
+
+.screen { position: fixed; inset: 0; display: none; }
+.screen.active { display: flex; }
+
+.brand-logo-svg { display: block; height: 30px; width: auto; aspect-ratio: 190 / 57; fill: var(--logo); }
+
+/* ── Shared buttons ── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 52px; padding: 0 18px; border-radius: 8px; border: 1px solid transparent;
+  font-size: 17px; font-weight: 500; line-height: 1.2; text-align: center;
+  transition: background-color .15s, border-color .15s, color .15s;
+}
+.btn-primary  { background: var(--primary); color: var(--on-primary); }
+.btn-primary:active { background: var(--primary-active); }
+.btn-outline  { background: var(--card); color: var(--text); border-color: var(--border-strong); }
+.btn-outline:active { background: var(--primary-tint); border-color: var(--primary); color: var(--primary-text); }
+.btn-danger   { background: var(--card); color: var(--error-text); border-color: var(--error-border); }
+.btn-danger:active { background: var(--error-bg); }
+/* Destructive button (Figma: button / type=destructive) */
+.btn-destructive { background: var(--danger-bg); color: var(--on-danger); border-color: transparent; border-radius: 6px; font-weight: 400; }
+.btn-destructive:hover { background: var(--danger-hover); }
+.btn-destructive:active { background: var(--danger-active); }
+.btn-ghost    { background: transparent; color: var(--text-2); }
+.btn-ghost:active { background: var(--primary-tint); color: var(--primary-text); }
+
+/* ── Footer (legal links + version), shown in Settings ── */
+#app-footer {
+  flex-shrink: 0; padding: 7px 16px; line-height: 1.5;
+  text-align: center; font-size: 12px; color: var(--text-3);
+  background: var(--page); border-top: 1px solid var(--border);
+}
+#app-footer a { color: var(--link); text-decoration: none; }
+#app-footer a:hover { color: var(--link-hover); text-decoration: underline; }
+
+/* ══ IDLE ══ */
+#screen-idle { flex-direction: row; }
+.idle-left {
+  width: 420px; flex-shrink: 0; display: flex; flex-direction: column;
+  padding: 0 22px 24px; background: var(--card); border-right: 1px solid var(--border);
+  position: relative; overflow: hidden;
+}
+.idle-left > *:not(.ribbon) { position: relative; }
+/* Logo sits in the vertical centre of the panel; the session card sits at the bottom,
+   of the panel */
+.idle-left > .brand { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); display: flex; justify-content: center; }
+.idle-left > .scard { margin: auto 0 0; }
+.brand .brand-logo-svg { height: 90px; }
+.brand-sub { font-size: 18px; font-weight: 500; color: var(--text-3); letter-spacing: 0.02em; }
+
+.scard { position: relative; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 60px 16px 18px; margin-bottom: 14px; cursor: pointer; transition: background-color .15s, border-color .15s; }
+.scard:active { background: var(--primary-tint); border-color: var(--primary); }
+.scard:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.scard-gear { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: var(--text-3); display: flex; }
+.scard-gear::before { width: 26px; height: 26px; }
+.scard-sub { font-size: 28px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; line-height: 1.2; word-break: break-word; }
+.scard-sub.is-empty { color: var(--text-disabled); font-weight: 500; }
+.scard-sid { font-family: var(--mono); font-size: 16px; color: var(--text-3); letter-spacing: 1px; margin-top: 4px; }
+.scard-sid:empty { display: none; }
+.scard-dev { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-2); margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.scard-dev:empty { display: none; }
+
+/* Scheduled start, shown under Start Session */
+.idle-sched { flex-direction: row; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; }
+.net-line { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px; color: var(--warning-text); margin-top: 14px; flex-shrink: 0; }
+.net-line::before { --icon: var(--i-wifioff); }
+.net-line.ok::before { --icon: var(--i-wifi); }
+.net-line.ok { color: var(--success-text); }
+/* Offline: a larger, unmissable notice (Start Session is disabled while offline) */
+.net-line:not(.ok) { flex-direction: column; font-size: 32px; font-weight: 700; line-height: 1.15; text-align: center;
+  gap: 8px; padding: 16px 18px; border-radius: 12px; background: var(--warning-bg); border: 2px solid var(--warning-border); }
+.net-line:not(.ok)::before { width: 44px; height: 44px; }
+
+.ibtns-bot { display: flex; gap: 10px; margin-top: auto; }
+.ibtns-bot .btn { flex: 1; min-height: 60px; padding: 0 10px; gap: 8px; font-size: 16px; white-space: nowrap; }
+.ribbon-idle { left: -30%; right: auto; width: 170%; top: -20px; bottom: auto; transform: scaleY(-1); }
+
+.idle-right {
+  flex: 1; position: relative; overflow: hidden; display: flex; flex-direction: column;
+  justify-content: center; padding: 24px; background: var(--ended-bg);
+}
+.ribbon { position: absolute; left: -12%; right: -30%; bottom: -8%; width: 142%; height: auto; pointer-events: none; opacity: var(--ribbon-opacity); }
+#btn-start {
+  position: relative; flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 14px;
+  font-size: 68px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; text-align: center;
+  background: var(--primary); color: var(--on-primary); border: none; border-radius: 16px;
+  box-shadow: var(--shadow-xl); transition: background-color .15s;
+}
+#btn-start::before { width: 88px; height: 88px; --icon: var(--i-playbold); }   /* heavier stroke at this size */
+#btn-start:not(.disabled):active { background: var(--primary-active); }
+#btn-start.disabled { background: var(--disabled-veil); color: var(--text-disabled); box-shadow: none; border: 1px dashed var(--border-strong); cursor: default; }
+.start-hint { position: relative; font-size: 15px; color: var(--text-2); text-align: center; margin-top: 8px; }
+.start-hint:empty { display: none; }
+
+/* ══ STREAMING ══ */
+#screen-streaming { flex-direction: row; }
+.sinfo {
+  width: 380px; flex-shrink: 0; display: flex; flex-direction: column;
+  background: var(--card); border-right: 1px solid var(--border); padding: 14px 18px 14px;
+}
+.si-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; min-height: 44px; }
+.live-logo .brand-logo-svg { height: 44px; }
+.si-top-r { display: flex; align-items: center; gap: 6px; margin-right: -10px; }
+.si-gear { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: none; border-radius: 50%; background: transparent; color: var(--text-3); }
+.si-gear::before { width: 24px; height: 24px; }
+.si-gear:active { background: var(--primary-tint); color: var(--primary-text); }
+.si-status {
+  display: inline-flex; align-items: center; gap: 7px; height: 28px; padding: 0 12px;
+  border-radius: 9999px; font-size: 14px; font-weight: 700; white-space: nowrap;
+  background: var(--info-bg); color: var(--info-text); border: 1px solid var(--info-border);
+}
+.si-status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.si-status[data-state="live"], .si-status[data-state="muted"] { display: none; }
+.si-status[data-state="warn"]  { background: var(--warning-bg); color: var(--warning-text); border-color: var(--warning-border); }
+.si-room { font-size: 22px; font-weight: 700; color: var(--text); line-height: 1.25; word-break: break-word; }
+.si-room:empty { display: none; }
+.si-meta { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.si-sid   { font-family: var(--mono); font-size: 16px; color: var(--text-3); letter-spacing: 1px; }
+.si-meta { align-items: center; }
+/* Elapsed time, then a Live (green) / Muted (orange) badge */
+.live-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px 4px 9px; border-radius: 9999px;
+  background: var(--card); color: var(--success-text); border: 1.5px solid var(--live-bg); white-space: nowrap; }
+.live-badge::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--live-bg); animation: live-pulse 1.6s ease-in-out infinite; }
+@keyframes live-pulse { 0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 var(--live-bg); } 60% { opacity: .55; transform: scale(.85); box-shadow: 0 0 0 4px transparent; } }
+.lb-live, .lb-muted { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+.lb-muted { display: none; }
+#screen-streaming.muted .live-badge { background: var(--muted-bg); color: var(--muted-text); border-color: var(--muted-bg); padding-left: 11px; }
+#screen-streaming.muted .live-badge::before { display: none; }
+#screen-streaming.muted .lb-live { display: none; }
+#screen-streaming.muted .lb-muted { display: inline; }
+#screen-streaming.muted .si-timer { color: var(--text-disabled); }
+.si-clock { display: flex; align-items: center; gap: 8px; }
+.si-timer { font-size: 14px; font-weight: 500; color: var(--text); font-variant-numeric: tabular-nums; letter-spacing: 0.01em; }
+
+/* ALS toggle */
+.tog-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 44px; }
+.als-row { margin: -2px 0 8px; }
+.als-row .tog-lbl { font-size: 15px; color: var(--text-2); }
+.tog-lbl { font-size: 16px; font-weight: 500; color: var(--text); cursor: pointer; }
+.tog-row.is-disabled .tog-lbl { color: var(--text-disabled); cursor: not-allowed; }
+.tog-wrap input:disabled + .tog-slide { opacity: .5; cursor: not-allowed; }
+.tog-wrap { position: relative; width: 48px; height: 28px; cursor: pointer; flex-shrink: 0; }
+.tog-wrap input { opacity: 0; width: 0; height: 0; }
+.tog-slide { position: absolute; inset: 0; background: var(--toggle-off); border-radius: 28px; transition: background-color .2s; }
+.tog-slide::before { content: ''; position: absolute; height: 22px; width: 22px; left: 3px; top: 3px; background: #FFF; border-radius: 50%; box-shadow: 0 1px 2px rgba(0,0,0,.25); transition: transform .2s; }
+input:checked + .tog-slide { background: var(--primary); }
+input:checked + .tog-slide::before { transform: translateX(20px); }
+.tog-wrap input:focus-visible + .tog-slide { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* Language quick switch */
+.ls-grid  { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 10px; padding-top: 12px; border-top: 1px solid var(--divider); }
+.ls-btn {
+  min-height: 52px; padding: 8px; font-size: 17px; font-weight: 500;
+  background: var(--card); color: var(--text); border: 1px solid var(--border-strong); border-radius: 8px;
+  text-align: center; line-height: 1.25; word-break: break-word; white-space: normal;
+  display: flex; align-items: center; justify-content: center;
+}
+.ls-btn:active { background: var(--primary-tint); }
+.ls-btn.active { background: var(--primary); color: var(--on-primary); border-color: var(--primary); font-weight: 700; }
+.ls-grid.many { grid-template-columns: repeat(3, 1fr); gap: 5px; }
+.ls-grid.many .ls-btn { min-height: 40px; padding: 4px; font-size: 14px; line-height: 1.15; }
+.ls-all { align-self: flex-start; min-height: 32px; margin: -6px 0 2px -8px; font-size: 14px; }
+
+/* ── More languages picker ── */
+#lang-overlay { position: fixed; inset: 0; z-index: 150; display: none; align-items: center; justify-content: center; padding: 16px; background: var(--overlay); }
+#lang-overlay.open { display: flex; }
+.lang-box { display: flex; flex-direction: column; width: 100%; max-width: 560px; height: 100%; padding: 16px 16px 0; border-radius: 16px;
+  background: var(--card); border: 1px solid var(--card-border); box-shadow: var(--shadow-xl); }
+.lang-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.lang-head-ic::before { width: 26px; height: 26px; }
+.lang-head h2 { flex: 1; font-size: 20px; font-weight: 500; color: var(--text); }
+.lang-close { width: 44px; height: 44px; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--chip-x-bg); color: var(--text); flex-shrink: 0; }
+.lang-close::before { width: 22px; height: 22px; }
+.lang-search { position: relative; }
+.lang-search::before { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; color: var(--text-3); pointer-events: none; }
+.lang-search input[type=text] { padding-left: 46px; }
+.lang-count { margin: 14px 0 6px; font-size: 16px; font-weight: 500; color: var(--text); }
+.lang-count span { color: var(--text-3); }
+.lang-list { flex: 1; min-height: 0; overflow-y: auto; margin: 0 -6px; padding: 0 6px 12px; }
+.lang-row { width: 100%; min-height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 4px;
+  padding: 8px 14px; border: none; border-radius: 6px; background: transparent; color: var(--text); text-align: left; font-size: 17px; }
+.lang-row:active { background: var(--primary-tint); }
+.lang-row.sel { background: var(--sel-bg); }
+.lang-row:disabled { opacity: .45; cursor: not-allowed; }
+.lang-name { display: block; }
+.lang-note { display: block; margin-top: 2px; font-size: 14px; color: var(--text-2); }
+.lang-row.cur .lang-name { font-weight: 700; }
+.lang-cur { margin-left: auto; font-size: 13px; font-weight: 500; color: var(--success-text); }
+.lang-check { display: flex; color: var(--text); flex-shrink: 0; }
+.lang-check::before { width: 22px; height: 22px; }
+.lang-empty { padding: 20px 14px; color: var(--text-3); font-size: 15px; }
+.als-warn { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; padding: 8px 12px; border-radius: 8px;
+  font-size: 15px; font-weight: 500; line-height: 1.3; color: var(--info-text); background: var(--info-bg); border: 1px solid var(--info-border); }
+.als-warn::before { width: 18px; height: 18px; }
+
+/* Schedule + caption row */
+/* Next automation: Wordly design-system chip (default state) — 32px tall, 16px radius, 1px gray border,
+   leading icon in info-text blue, Roboto 16/24, trailing × in a 22px gray circle */
+.sched-wrap { display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 4px; border-radius: 16px;
+  background: var(--chip-bg); border: 1px solid var(--chip-border); white-space: nowrap; }
+.sched-pill { display: none; align-items: center; gap: 4px; padding: 0 2px 0 2px; font-size: 16px; font-weight: 400; line-height: 24px;
+  color: var(--text); font-variant-numeric: tabular-nums; }
+.sched-pill::before { --icon: var(--i-clock); width: 16px; height: 16px; color: var(--info-text-chip); background-color: var(--info-text-chip); }
+.sched-pill.active, .sched-pill.warn, .sched-pill.urgent { display: inline-flex; }
+#sched-cancel, .sched-x { display: none; width: 22px; height: 22px; padding: 0; border: none; border-radius: 50%; flex-shrink: 0;
+  align-items: center; justify-content: center; background: var(--chip-x-bg); color: var(--chip-x); }
+.sched-x[style*="inline"] { display: inline-flex !important; }
+.sched-x:active { filter: brightness(.92); }
+.sched-x::before { width: 12px; height: 12px; }
+/* the × needs a larger touch area than its 22px circle */
+#sched-cancel, .sched-x { position: relative; }
+.sched-x::after { content: ""; position: absolute; inset: -11px; }
+.sched-lbl { font-size: 13px; font-weight: 500; color: var(--text-3); white-space: nowrap; padding-left: 2px; }
+.cap-pill {
+  position: absolute; top: 8px; right: 8px; z-index: 1; width: 44px; height: 44px; padding: 0;
+  display: flex; align-items: center; justify-content: center; border-radius: 10px;
+  background: var(--card); color: var(--primary-text); border: 1px solid var(--border-strong); box-shadow: var(--shadow-sm);
+  transition: background-color .15s, color .15s;
+}
+.cap-pill::before { width: 22px; height: 22px; }
+.cap-pill:active { background: var(--primary-tint); }
+.cap-pill.fired { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+
+/* Audio level: same green as the Mute button */
+.meter-wrap  { margin-top: auto; padding-top: 10px; }
+.meter-label { font-size: 13px; font-weight: 500; color: var(--text-3); margin-bottom: 6px; }
+.meter-track { position: relative; width: 100%; height: 14px; background: var(--track); border-radius: 9999px; overflow: hidden; }
+.meter-fill  { height: 100%; width: 0%; border-radius: 9999px; background: var(--live-bg); transition: width 80ms linear; }
+
+/* Right action panel */
+.sactions { flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 12px; background: var(--page); }
+#btn-mute {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  background: var(--live-bg); color: var(--live-text); border: 2px solid var(--live-bg); border-radius: 16px;
+  font-size: 44px; font-weight: 700; letter-spacing: -0.01em; box-shadow: none;
+  transition: background-color .15s, color .15s, border-color .15s;
+}
+#btn-mute::before { width: 52px; height: 52px; }
+#btn-mute:active { background: var(--live-active); border-color: var(--live-active); }
+#btn-mute.muted { --icon: var(--i-micoff); background: var(--error-bg); color: var(--text); border-color: var(--error-solid); box-shadow: none; }
+#btn-mute.muted::before { background-color: var(--error-text); }
+
+.iframe-wrap { position: relative; height: 140px; flex-shrink: 0; background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.iframe-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
+
+.sbot { display: flex; gap: 8px; height: 72px; flex-shrink: 0; }
+.sbot .btn { flex: 1 1 0; min-width: 0; min-height: 0; padding: 0 8px; font-size: 17px; gap: 7px; line-height: 1.15; }
+body:not(.portrait) .sbot .btn { flex-direction: column; gap: 4px; font-size: 16px; padding: 0 6px; white-space: nowrap; }
+body:not(.portrait) .sbot .btn::before { width: 20px; height: 20px; }
+/* Next automation sits between Split now and End session; only shown while a schedule is armed */
+.sched-cell { display: flex; flex-direction: column; justify-content: center; gap: 4px; flex: 0 0 auto; min-width: 0; }
+.sched-cell:not(:has(.sched-pill.active, .sched-pill.warn, .sched-pill.urgent)) { display: none; }
+#btn-split.flash { --icon: var(--i-check); background: var(--success-bg); color: var(--success-text); border-color: var(--success-border); }
+
+/* ══ ERROR + ENDED ══ */
+#screen-error, #screen-ended { align-items: center; justify-content: center; padding: 24px; background: var(--soft-gradient); }
+#screen-ended, #screen-error { position: fixed; overflow: hidden; background: var(--ended-bg); }
+#screen-ended .notice, #screen-error .notice { position: relative; }
+.ribbon-ended { left: -10%; right: auto; width: 125%; bottom: -14%; }
+.notice {
+  width: 100%; max-width: 520px; background: var(--card); border: 1px solid var(--card-border); border-radius: 16px; box-shadow: var(--shadow-lg);
+  padding: 34px 36px 30px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;
+}
+.notice-ic { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; }
+.notice-ic::before { width: 30px; height: 30px; }
+#screen-error .notice-ic { background: var(--error-bg); color: var(--error-text); }
+#screen-ended .notice-ic { background: var(--success-bg); color: var(--success-text); }
+.e-title, .en-title { font-size: 32px; font-weight: 700; letter-spacing: -0.01em; color: var(--text); }
+.e-msg, .en-sub { font-size: 17px; line-height: 1.5; color: var(--text-2); max-width: 440px; white-space: pre-line; }
+.en-cd { font-size: 15px; color: var(--text-3); font-variant-numeric: tabular-nums; min-height: 22px; }
+.notice .btn { width: 100%; max-width: 320px; margin-top: 10px; min-height: 58px; font-size: 19px; }
+.notice .btn + .btn { margin-top: 0; min-height: 48px; font-size: 16px; }
+
+/* ══ SETUP PANEL ══ */
+#panel { position: fixed; inset: 0; background: var(--page); z-index: 100; display: none; flex-direction: column; }
+#panel.open { display: flex; }
+.phdr { display: flex; align-items: center; justify-content: space-between; height: 60px; padding: 0 16px 0 24px; background: var(--card); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.phdr-l { display: flex; align-items: center; gap: 14px; }
+.phdr .brand-logo-svg { height: 24px; }
+.phdr h2 { font-size: 18px; font-weight: 500; color: var(--text-2); padding-left: 14px; border-left: 1px solid var(--border); line-height: 24px; }
+.pclose { min-height: 44px; font-size: 16px; }
+#panel.first-run .pclose { display: none; }
+.intro { font-size: 16px; line-height: 1.5; color: var(--text-2); margin-top: 16px; max-width: 620px; }
+.pbody { flex: 1; overflow-y: auto; padding: 8px 24px 24px; }
+.pfoot { padding: 12px 24px; background: var(--card); border-top: 1px solid var(--border); flex-shrink: 0; }
+
+.psec { background: var(--card); border: 1px solid var(--card-border); border-radius: 12px; padding: 4px 20px 20px; margin-top: 16px; }
+.psec-h { font-size: 18px; font-weight: 700; color: var(--text); margin-top: 16px; }
+.fl { display: block; font-size: 15px; font-weight: 500; color: var(--text-2); margin: 16px 0 6px; }
+.fl .opt { color: var(--text-3); font-weight: 400; }
+input[type=text], input[type=password], select {
+  width: 100%; height: 52px; padding: 0 14px; background: var(--input-bg); color: var(--text);
+  border: 1px solid var(--input-border); border-radius: 6px; font-size: 17px; outline: none;
+}
+select { padding-right: 40px; appearance: none; -webkit-appearance: none;
+  background-image: var(--chevron); background-repeat: no-repeat; background-position: right 12px center; background-size: 20px; }
+input::placeholder { color: var(--text-disabled); }
+input:disabled { background: var(--raised); color: var(--text-3); border-color: var(--border); cursor: not-allowed; -webkit-text-fill-color: var(--text-3); opacity: 1; }
+input[type=text]:focus, input[type=password]:focus, select:focus, input[type=time]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--focus-halo); }
+input:focus-visible, select:focus-visible { outline: none; }
+.sid-input { font-family: var(--mono); font-size: 22px !important; letter-spacing: 3px; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+.field { min-width: 0; }
+body.portrait .field-row { gap: 10px; }
+body.portrait .sid-input { font-size: 18px !important; letter-spacing: 2px; padding: 0 10px; }
+.pw-wrap { position: relative; }
+.pw-wrap input { padding-right: 76px; }
+.pw-tog { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); height: 40px; padding: 0 12px; background: none; border: none; border-radius: 6px; color: var(--primary-text) !important; font-size: 15px; font-weight: 500; }
+.pw-tog:active { background: var(--primary-tint); }
+.hint { font-size: 14px; color: var(--text-3); margin-top: 6px; }
+.hint.ok { color: var(--success-text); }
+.hint:empty { display: none; }
+.msg  { font-size: 14px; color: var(--text-3); margin-top: 10px; min-height: 20px; }
+.msg.ok  { color: var(--success-text); }
+.msg.err { color: var(--error-text); }
+#w-sess-msg { margin-top: 8px; }
+#w-sess-msg:empty { display: none; }
+.btn-test { margin-top: 8px; min-height: 48px; font-size: 16px; }
+/* Microphone: selector and Test microphone share a row in landscape, stack in portrait */
+.audio-row { display: flex; align-items: center; gap: 10px; }
+.audio-row select { flex: 1; min-width: 0; }
+.audio-row .btn-test { margin-top: 0; min-height: 52px; flex-shrink: 0; white-space: nowrap; }
+body.portrait .audio-row { flex-direction: column; align-items: stretch; }
+body.portrait .audio-row select { flex: none; }
+body.portrait .audio-row .btn-test { align-self: flex-start; min-height: 48px; }
+.btn-test.is-locked { background: var(--error-bg); color: var(--error-text); border-color: var(--error-border); }
+
+/* Appearance segmented control */
+.seg { display: inline-flex; margin-top: 2px; padding: 4px; gap: 4px; background: var(--raised); border: 1px solid var(--border); border-radius: 10px; }
+.seg button { min-height: 44px; min-width: 96px; padding: 0 16px; border: 1px solid transparent; border-radius: 7px; background: transparent; color: var(--text-2); font-size: 16px; font-weight: 500; }
+.seg button[aria-pressed="true"] { background: var(--card); color: var(--text); border-color: var(--border-strong); box-shadow: var(--shadow-sm); font-weight: 700; }
+
+.sched { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+.sched-row { display: flex; align-items: center; gap: 12px; }
+.sched-row label { width: 64px; flex-shrink: 0; font-size: 16px; color: var(--text-2); }
+.sched-split { display: flex; flex-direction: column; gap: 10px; }
+.psec-hrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.psec-hrow .link-btn { margin-top: 14px; margin-right: -8px; }
+.link-btn { min-height: 44px; padding: 0 8px; background: none; border: none; border-radius: 6px; color: var(--link); font-size: 15px; font-weight: 500; }
+.link-btn:hover, .link-btn:active { color: var(--link-hover); text-decoration: underline; }
+.sched-row input[type=time] { height: 44px; padding: 0 10px; font-size: 16px; color: var(--text); background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 6px; outline: none; }
+
+.btn-save { width: 100%; min-height: 58px; font-size: 19px; font-weight: 700; }
+
+/* ── Confirm dialog ── */
+#conf-overlay { position: fixed; inset: 0; background: var(--overlay); z-index: 200; display: none; align-items: center; justify-content: center; }
+#conf-overlay.open { display: flex; }
+.conf-box  { background: var(--card); border: 1px solid var(--card-border); border-radius: 16px; padding: 30px 30px 24px; max-width: 460px; width: 90%; box-shadow: var(--shadow-xl); }
+.conf-head { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+.conf-ic { display: flex; flex-shrink: 0; color: var(--text); }
+.conf-ic::before { width: 26px; height: 26px; }
+.conf-ic.is-danger { color: var(--error-text); }
+.conf-title { font-size: 22px; font-weight: 700; line-height: 1.3; color: var(--text); }
+.conf-msg  { font-size: 17px; line-height: 1.5; color: var(--text-2); margin-bottom: 24px; white-space: pre-line; }
+.conf-btns { display: flex; gap: 10px; }
+.conf-btns .btn { flex: 1; min-height: 56px; font-size: 18px; }
+
+/* ══ PORTRAIT (480 × 800) ══ */
+body.portrait #screen-idle    { flex-direction: column; }
+body.portrait .idle-left      { width: 100%; border-right: none; border-bottom: 1px solid var(--border); padding: 0 20px 20px; flex: 1; }
+body.portrait .idle-right     { flex: none; height: 360px; padding: 20px; }
+body.portrait #btn-start      { font-size: 56px; gap: 10px; }
+body.portrait #btn-start::before { width: 72px; height: 72px; }
+body.portrait .ribbon         { left: -30%; width: 190%; bottom: -20%; }
+body.portrait .ribbon-idle    { left: -20%; width: 150%; top: -24px; bottom: auto; }
+body.portrait .ribbon-ended   { left: -40%; width: 220%; bottom: -6%; }
+
+body.portrait #screen-streaming { flex-direction: column; }
+body.portrait .sinfo          { width: 100%; border-right: none; padding: 12px 16px; flex-shrink: 0; }
+body.portrait .si-room        { font-size: 20px; }
+
+body.portrait .si-meta        { margin-bottom: 6px; }
+body.portrait .ls-grid        { grid-template-columns: repeat(4, 1fr); gap: 4px; }
+body.portrait .ls-btn         { padding: 6px 4px; font-size: 13px; min-height: 40px; }
+body.portrait .ls-grid.many   { grid-template-columns: repeat(4, 1fr); gap: 4px; }
+body.portrait .ls-grid.many .ls-btn { font-size: 13px; min-height: 40px; }
+body.portrait .meter-wrap     { margin-top: 8px; }
+body.portrait .sactions       { flex: 1; background: var(--card); padding-top: 4px; }
+body.portrait #btn-mute       { flex: 0 0 150px; font-size: 38px; gap: 4px; }
+body.portrait #btn-mute::before { width: 40px; height: 40px; }
+body.portrait .iframe-wrap    { flex: 1; height: auto; min-height: 120px; }
+body.portrait .sbot           { height: 60px; }
+body.portrait .sbot .btn      { font-size: 15px; gap: 6px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="wordly-logo" viewBox="0 0 190 57"><path d="M61.4796 8.82276L63.6284 0.638193H59.8735C54.0357 0.638193 48.9241 4.5838 47.4426 10.2309L42.7783 28.0668L35.9578 0.630859H27.5092L20.7254 27.9568L16.0831 10.2309C14.609 4.5838 9.49732 0.638193 3.65959 0.638193H0L2.14882 8.82276H3.65959C5.77907 8.82276 7.63453 10.2529 8.1699 12.3063L15.3717 39.9769H24.8764L31.7409 13.5751L38.6053 39.9769H48.11L55.3632 12.3063C55.8985 10.2602 57.754 8.82276 59.8735 8.82276H61.4796Z"/><path d="M91.9736 24.0109V39.9693H100.158V24.0109C100.158 21.114 102.52 18.7525 105.417 18.7525H109.127L111.269 10.568H105.417C98.0021 10.568 91.9736 16.5964 91.9736 24.0109Z"/><path d="M80.7241 12.4598C78.3993 11.1544 75.8104 10.509 72.9649 10.509C70.1193 10.509 67.5158 11.1617 65.1763 12.4598C62.8368 13.7652 60.9667 15.54 59.5806 17.7915C58.1872 20.043 57.4978 22.6318 57.4978 25.5507C57.4978 28.4696 58.1945 31.0144 59.5806 33.2879C60.974 35.5614 62.8368 37.3435 65.1763 38.649C67.5158 39.9544 70.112 40.5998 72.9649 40.5998C75.8177 40.5998 78.4066 39.947 80.7241 38.649C83.0489 37.3435 84.9044 35.5614 86.2978 33.2879C87.6912 31.0144 88.3806 28.4402 88.3806 25.5507C88.3806 22.6612 87.6839 20.043 86.2978 17.7915C84.9044 15.54 83.0489 13.7579 80.7241 12.4598ZM79.272 29.6723C78.6559 30.8677 77.8125 31.7991 76.7345 32.4739C75.6637 33.1412 74.4023 33.4786 72.9575 33.4786C71.5128 33.4786 70.244 33.1412 69.1586 32.4739C68.0659 31.8065 67.2151 30.8751 66.5991 29.6723C65.9831 28.4769 65.675 27.1055 65.675 25.5507C65.675 23.9959 65.9831 22.6392 66.5991 21.4584C67.2151 20.2777 68.0659 19.3463 69.1586 18.6569C70.2514 17.9675 71.5128 17.6302 72.9575 17.6302C74.4023 17.6302 75.6564 17.9749 76.7345 18.6569C77.8052 19.3463 78.6559 20.2777 79.272 21.4584C79.888 22.6392 80.196 24.0033 80.196 25.5507C80.196 27.0982 79.888 28.4769 79.272 29.6723Z"/><path d="M134.488 13.5971C133.732 12.8417 132.852 12.1964 131.818 11.6977C130.183 10.9056 128.305 10.5096 126.193 10.5096C123.45 10.5096 120.964 11.177 118.749 12.519C116.534 13.8538 114.774 15.6579 113.469 17.9314C112.163 20.2049 111.518 22.7424 111.518 25.5586C111.518 28.3748 112.163 30.8757 113.447 33.1638C114.73 35.452 116.483 37.2634 118.698 38.6055C120.913 39.9403 123.436 40.615 126.252 40.615C128.225 40.615 130.051 40.2556 131.745 39.5296C133.043 38.9722 134.136 38.2095 135.016 37.2488V39.9843H142.408V0.000183105H134.488V13.5971ZM133.556 29.6729C132.94 30.8683 132.089 31.7997 130.997 32.4744C129.904 33.1418 128.635 33.4792 127.198 33.4792C125.76 33.4792 124.462 33.1418 123.318 32.4744C122.174 31.8071 121.287 30.8757 120.649 29.6729C120.018 28.4775 119.695 27.1061 119.695 25.5513C119.695 23.9965 120.011 22.6398 120.649 21.459C121.279 20.2783 122.174 19.3469 123.318 18.6575C124.462 17.9681 125.753 17.6307 127.198 17.6307C128.643 17.6307 129.911 17.9681 130.997 18.6355C132.089 19.3029 132.94 20.2343 133.556 21.437C134.172 22.6324 134.48 24.0038 134.48 25.5586C134.48 27.1134 134.172 28.4848 133.556 29.6802V29.6729Z"/><path d="M155.003 0.000183105H147.083V39.9696H155.003V0.000183105Z"/><path d="M189.113 11.1396H180.613L175.032 26.3354C174.577 27.3694 174.145 28.4108 173.719 29.4596L166.994 11.1396H158.494L169.803 39.8296C168.945 42.1691 167.918 44.6186 166.657 45.9021C163.269 50.251 155.209 50.0237 155.033 43.6212H147.149C147.002 49.6716 151.659 55.2087 157.585 56.2868C166.041 58.0982 173.602 51.9231 176.139 44.2959L189.113 11.1396Z"/></symbol></svg>
+
+<!-- IDLE -->
+<div id="screen-idle" class="screen active">
+  <div class="idle-left">
+    <svg class="ribbon ribbon-idle" viewBox="0 0 1500 683" fill="none" aria-hidden="true"><path d="M-128.475 730.771C-128.475 730.771 111.292 507.499 299.891 470.136C556.965 419.209 768.426 554.05 1020.41 600.594C1231.56 639.594 1438.82 488.481 1578.81 19.3393" stroke="url(#ribbon-grad)" stroke-width="120" stroke-linecap="round"/><defs><linearGradient id="ribbon-grad" x1="-125.642" y1="758.596" x2="1612.25" y2="323.974" gradientUnits="userSpaceOnUse"><stop stop-color="#3CFF52"/><stop offset="0.51" stop-color="#00D0FF"/><stop offset="1" stop-color="#017CFF"/></linearGradient></defs></svg>
+    <div class="brand"><svg class="brand-logo-svg" role="img" aria-label="Wordly"><use href="#wordly-logo"/></svg></div>
+    <div class="scard" role="button" tabindex="0" aria-label="Open Settings" onclick="openPanel()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPanel();}">
+      <span class="scard-gear ic-settings" aria-hidden="true"></span>
+      <div class="scard-sub is-empty" id="card-sub">Not configured</div>
+      <div class="scard-sid" id="card-sid"></div>
+      <div class="scard-dev ic-mic" id="card-dev"></div>
+    </div>
+  </div>
+  <div class="idle-right">
+    <button id="btn-start" class="disabled ic-play" onclick="startSession()">Start Session</button>
+    <div class="sched-cell idle-sched"><span class="sched-lbl">Next automation:</span><div class="sched-wrap"><div class="sched-pill" id="idle-sched-pill"></div><button id="idle-sched-cancel" class="ic-x sched-x" onclick="cancelScheduledStart()" aria-label="Cancel scheduled start"></button></div></div>
+    <div class="net-line" id="net-line">Checking network…</div>
+    <div class="start-hint" id="start-hint">Configure session first.</div>
+  </div>
+</div>
+
+<!-- STREAMING -->
+<div id="screen-streaming" class="screen">
+  <div class="sinfo">
+    <div class="si-top">
+      <div class="live-logo"><svg class="brand-logo-svg" role="img" aria-label="Wordly"><use href="#wordly-logo"/></svg></div>
+      <div class="si-top-r"><div class="si-status" id="si-status" data-state="live" role="status">Live</div><button type="button" class="si-gear ic-settings" onclick="openPanel()" aria-label="Settings" title="Settings"></button></div>
+    </div>
+    <div class="si-room" id="si-room"></div>
+    <div class="si-meta">
+      <div class="si-sid" id="si-sid">—</div>
+      <div class="si-clock"><span class="si-timer" id="si-timer">00:00:00</span><span class="live-badge" role="status"><span class="lb-live">Live</span><span class="lb-muted">Muted</span></span></div>
+    </div>
+    <div class="ls-grid" id="ls-grid"></div>
+    <button type="button" class="link-btn ls-all" id="ls-all" onclick="openLangModal()">More languages</button>
+    <div class="tog-row als-row" id="als-row">
+      <label class="tog-lbl" for="als-tog">Automatically select language</label>
+      <label class="tog-wrap"><input type="checkbox" id="als-tog" onchange="setAls(this.checked)" checked><span class="tog-slide"></span></label>
+    </div>
+    <div class="als-warn ic-info" id="als-warn" role="status" hidden>Languages do not support auto selection</div>
+    <div class="meter-wrap">
+      <div class="meter-label">Audio level</div>
+      <div class="meter-track"><div class="meter-fill" id="meter-fill"></div></div>
+    </div>
+  </div>
+  <div class="sactions">
+    <button id="btn-mute" class="ic-mic" onclick="toggleMute()">Mute</button>
+    <div class="iframe-wrap">
+      <button class="cap-pill ic-popout" id="cap-pill" onclick="launchCaptions()" aria-label="Open caption screen" title="Open caption screen"></button>
+      <iframe id="s-iframe" src="about:blank" allow="autoplay" sandbox="allow-scripts allow-same-origin allow-popups" title="Live captions"></iframe>
+    </div>
+    <div class="sbot">
+      <div class="sched-cell"><span class="sched-lbl">Next automation:</span><div class="sched-wrap"><div class="sched-pill" id="sched-pill"></div><button id="sched-cancel" class="ic-x sched-x" onclick="cancelSchedule()" aria-label="Cancel schedule"></button></div></div>
+      <button id="btn-split" class="btn btn-outline ic-split" onclick="confirm2('Split the transcript?\nAudio continues without interruption.', doSplit, {label:'Split transcript', icon:'ic-split'})">Split now</button>
+      <button id="btn-end"   class="btn btn-danger ic-exit" onclick="confirm2('End the session for everyone?\nAttendees will be disconnected.', doEnd, {label:'End', danger:true, icon:'ic-exit'})">End session</button>
+    </div>
+  </div>
+</div>
+
+<!-- ERROR -->
+<div id="screen-error" class="screen">
+    <svg class="ribbon ribbon-ended" viewBox="0 0 1500 683" fill="none" aria-hidden="true"><path d="M-128.475 730.771C-128.475 730.771 111.292 507.499 299.891 470.136C556.965 419.209 768.426 554.05 1020.41 600.594C1231.56 639.594 1438.82 488.481 1578.81 19.3393" stroke="url(#ribbon-grad-error)" stroke-width="120" stroke-linecap="round"/><defs><linearGradient id="ribbon-grad-error" x1="-125.642" y1="758.596" x2="1612.25" y2="323.974" gradientUnits="userSpaceOnUse"><stop stop-color="#3CFF52"/><stop offset="0.51" stop-color="#00D0FF"/><stop offset="1" stop-color="#017CFF"/></linearGradient></defs></svg>
+  <div class="notice">
+    <div class="notice-ic ic-wifioff" aria-hidden="true"></div>
+    <div class="e-title">Connection lost</div>
+    <div class="e-msg" id="e-msg">Connection dropped.</div>
+    <button id="btn-giveup" class="btn btn-primary" onclick="exitAfterError()">Exit</button>
+  </div>
+</div>
+
+<!-- ENDED -->
+<div id="screen-ended" class="screen">
+    <svg class="ribbon ribbon-ended" viewBox="0 0 1500 683" fill="none" aria-hidden="true"><path d="M-128.475 730.771C-128.475 730.771 111.292 507.499 299.891 470.136C556.965 419.209 768.426 554.05 1020.41 600.594C1231.56 639.594 1438.82 488.481 1578.81 19.3393" stroke="url(#ribbon-grad-ended)" stroke-width="120" stroke-linecap="round"/><defs><linearGradient id="ribbon-grad-ended" x1="-125.642" y1="758.596" x2="1612.25" y2="323.974" gradientUnits="userSpaceOnUse"><stop stop-color="#3CFF52"/><stop offset="0.51" stop-color="#00D0FF"/><stop offset="1" stop-color="#017CFF"/></linearGradient></defs></svg>
+  <div class="notice">
+    <div class="notice-ic ic-checkcircle" aria-hidden="true"></div>
+    <div class="en-title">Session ended</div>
+    <div class="en-sub" id="en-sub">Session ended.</div>
+    <div class="en-cd"  id="en-cd"></div>
+    <button id="btn-restart"  class="btn btn-primary" onclick="returnToIdle()">Return now</button>
+  </div>
+</div>
+
+<!-- PANEL -->
+<div id="panel">
+  <div class="phdr"><div class="phdr-l"><svg class="brand-logo-svg" role="img" aria-label="Wordly"><use href="#wordly-logo"/></svg><h2 id="panel-title">Settings</h2></div><button class="btn btn-ghost pclose ic-x" onclick="closePanel()">Close</button></div>
+  <div class="pbody" id="panel-body"></div>
+  <div class="pfoot" id="panel-foot"></div>
+  <div id="app-footer"><a href="https://wordly.ai/" target="_blank" rel="noopener">Wordly AI Interpretation</a> | <a href="https://wordly.ai/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a> | <a href="https://wordly.ai/wordly-inc-terms-of-service" target="_blank" rel="noopener">Terms of Service</a> | Copyright &copy; 2019-2026 Wordly, Inc. | <span class="app-ver"></span></div>
+</div>
+
+<!-- LANGUAGE PICKER -->
+<div id="lang-overlay" role="dialog" aria-modal="true" aria-labelledby="lang-title" onclick="if(event.target===this)closeLangModal()">
+  <div class="lang-box">
+    <div class="lang-head"><span class="lang-head-ic ic-languages" aria-hidden="true"></span><h2 id="lang-title">Speaker’s language</h2><button type="button" class="lang-close ic-x" onclick="closeLangModal()" aria-label="Close"></button></div>
+    <div class="lang-search ic-search"><input type="text" id="lang-search" placeholder="Search for languages" oninput="renderLangList()" autocomplete="off" spellcheck="false" aria-label="Search for languages"></div>
+    <div class="lang-count">Choose the language being spoken <span>(tap a checked language to remove it)</span></div>
+    <div class="lang-list" id="lang-list" role="listbox"></div>
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div id="conf-overlay" role="dialog" aria-modal="true" aria-labelledby="conf-title">
+  <div class="conf-box">
+    <div class="conf-head"><span class="conf-ic" id="conf-ic" aria-hidden="true" hidden></span><div class="conf-title" id="conf-title"></div></div>
+    <div class="conf-msg" id="conf-msg"></div>
+    <div class="conf-btns">
+      <button class="btn btn-outline conf-no" onclick="closeConf()">Cancel</button>
+      <button class="btn btn-primary conf-yes" id="conf-yes">Yes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════
+const CONNECTION_CODE    = '9005';
+const WSS_URL            = 'wss://endpoint.wordly.ai/present';
+const TARGET_SAMPLE_RATE = 16000;
+const CHUNK_FRAMES       = 1600;   // 100ms at 16kHz
+const ECHO_MS            = 30000;  // keepalive every 30s
+
+// ═══════════════════════════════════════
+// CONFIG — localStorage
+// ═══════════════════════════════════════
+let cfg = {};
+try { cfg = JSON.parse(localStorage.getItem('wordly_cfg') || '{}'); } catch(e) {}
+function saveCfg() { try { localStorage.setItem('wordly_cfg', JSON.stringify(cfg)); } catch(e) {} }
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let ws          = null;
+let audioCtx    = null;
+let stream      = null;
+let processor   = null;
+let pcmBuffer   = new Float32Array(0);
+let echoTimer   = null;
+let timerInt    = null;
+let timerStart  = null;
+let cdTimer     = null;
+let muted       = false;
+let connected   = false;
+// Stop-reason model: null | 'user' | 'schedule' | 'drop'
+// 'schedule' is reserved — not used yet, but defined here so scheduling
+// doesn't require a rewrite when added. All recovery decisions route
+// through shouldAutoRecover() — the single gate.
+let stopReason  = null;
+let retryCount  = 0;
+let retryTimer  = null;
+const MAX_RETRIES = 5;
+const RETRY_DELAYS = [100, 500, 1000, 2000, 5000];
+let currentLang = 'en';
+let alsEnabled  = true;
+let sessionLangs= [];
+let langNames   = {};
+let langDetect  = {};  // wordlyCode → 'preferred' | 'supported' | 'none'
+let langList    = [];  // full list for the More languages picker
+
+// ═══════════════════════════════════════
+// LANGUAGE NAMES
+// ═══════════════════════════════════════
+async function loadLangNames() {
+  try {
+    const r = await fetch('https://assets.wordly.ai/language-config/languages.json');
+    const d = await r.json();
+    (d.languages || []).forEach(l => { langNames[l.wordlyCode] = l.englishName; langDetect[l.wordlyCode] = l.detectability;
+      langList.push({ code: l.wordlyCode, name: l.englishName, native: l.nativeName, detect: l.detectability, transcribable: l.isTranscribable }); });
+    langList.sort((a, b) => a.name.localeCompare(b.name));
+    if (typeof onLangDataLoaded === 'function') onLangDataLoaded();
+  } catch(e) {
+    Object.assign(langNames, {
+      'en':'English (US)','es':'Spanish (ES)','es-MX':'Spanish (LatAm)',
+      'fr':'French (FR)','fr-CA':'French (CA)','de':'German','ja':'Japanese',
+      'ko':'Korean','zh-CN':'Chinese (Simplified)','zh-HK':'Cantonese',
+      'ar':'Arabic','pt-BR':'Portuguese (BR)','pt':'Portuguese (PT)',
+      'it':'Italian','ru':'Russian','hi':'Hindi','nl':'Dutch','tr':'Turkish',
+    });
+  }
+}
+loadLangNames();
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+function normSid(raw) {
+  const c = raw.replace(/[^A-Za-z0-9]/g,'').toUpperCase();
+  return (c.length === 8 && /^[A-Z]{4}\d{4}$/.test(c)) ? c.slice(0,4)+'-'+c.slice(4) : '';
+}
+function parseLink(raw) {
+  const m = raw.match(/join\.wordly\.ai\/join\/([A-Za-z0-9]{4}-?[0-9]{4})/);
+  if (!m) return {sid:'', pass:''};
+  const sid = normSid(m[1]);
+  const km  = raw.match(/[?&]key=([^&\s]+)/);
+  return {sid, pass: km ? km[1] : ''};
+}
+function setStatus(state,text){const e=document.getElementById('si-status');e.textContent=text;e.dataset.state=state;}
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+}
+function fmtTime(s) {
+  return [Math.floor(s/3600), Math.floor((s%3600)/60), s%60].map(n=>String(n).padStart(2,'0')).join(':');
+}
+
+// ═══════════════════════════════════════
+// CONFIRM DIALOG
+// ═══════════════════════════════════════
+function confirm2(msg, cb, opts = {}) {
+  // first line is the heading; opts.icon shows the opening button's icon beside it
+  const nl = msg.indexOf('\n');
+  document.getElementById('conf-title').textContent = nl > -1 ? msg.slice(0, nl) : msg;
+  document.getElementById('conf-msg').textContent = nl > -1 ? msg.slice(nl + 1) : '';
+  const ic = document.getElementById('conf-ic');
+  ic.className = 'conf-ic ' + (opts.icon || ''); ic.hidden = !opts.icon; ic.classList.toggle('is-danger', !!opts.danger);
+  const yes = document.getElementById('conf-yes');
+  yes.textContent = opts.label || 'Yes';
+  yes.classList.toggle('btn-primary', !opts.danger);
+  yes.classList.toggle('btn-destructive', !!opts.danger);
+  document.getElementById('conf-yes').onclick = () => { closeConf(); cb(); };
+  document.getElementById('conf-overlay').classList.add('open');
+}
+function closeConf() { document.getElementById('conf-overlay').classList.remove('open'); }
+
+// ═══════════════════════════════════════
+// IDLE
+// ═══════════════════════════════════════
+const APP_VERSION = 'v3.2g';
+function loadIdle() {
+  document.querySelectorAll('.app-ver').forEach(e => e.textContent = APP_VERSION);
+  const sid   = cfg.sessionId || '';
+  const ready = !!(sid && cfg.passcode && cfg.deviceId !== undefined && cfg.deviceId !== null && cfg.deviceId !== '');
+  const sidEl = document.getElementById('card-sid');
+  const subEl = document.getElementById('card-sub');
+  subEl.textContent = cfg.presenter || (sid ? sid : 'Not configured');
+  subEl.classList.toggle('is-empty', !cfg.presenter && !sid);
+  sidEl.textContent = sid && cfg.presenter ? sid : '';
+  document.getElementById('card-dev').textContent = cfg.deviceLabel || '';
+  document.getElementById('si-sid').textContent   = sid || '—';
+  document.getElementById('si-room').textContent  = cfg.presenter || '';
+  const online = navigator.onLine;
+  const netEl  = document.getElementById('net-line');
+  netEl.textContent = online ? 'Network connected' : 'No network connection';
+  netEl.className   = 'net-line' + (online ? ' ok' : '');
+  // Leave was removed, so a session can no longer be left open; clear any flag saved by an older version
+  if (cfg.leftOpen) { cfg.leftOpen = false; saveCfg(); }
+  const btn  = document.getElementById('btn-start');
+  btn.classList.toggle('disabled', !(ready && online));
+  document.getElementById('start-hint').textContent = ready ? '' : 'Configure session first.';
+}
+
+// ═══════════════════════════════════════
+// PANELS
+// ═══════════════════════════════════════
+// Setup isn't complete (session, passcode, name or microphone missing), so Settings is the first screen and can't be dismissed
+function needsSetup() { return !(cfg.sessionId && cfg.passcode && cfg.presenter && cfg.deviceId); }
+function openPanel() { document.getElementById('panel').classList.add('open'); buildWordlyPanel(); }
+function closePanel() { if (needsSetup()) return; document.getElementById('panel').classList.remove('open'); loadIdle(); }
+
+function isLegBuild() {
+  return typeof firebase !== 'undefined';
+}
+function refreshSetupToggles() {
+  const cur = getTheme(); document.querySelectorAll('#theme-seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.t === cur)));
+  const l = document.getElementById('btn-lockout');
+  if (l) { const locked = !!cfg.cloudLockout; l.textContent = locked ? 'Cloud control locked. Tap to allow.' : 'Cloud control allowed. Tap to lock out.'; l.classList.toggle('is-locked', locked); }
+}
+function getTheme(){try{return localStorage.getItem('wordly_theme')||'system';}catch(e){return 'system';}}
+function setTheme(t){try{if(t==='system')localStorage.removeItem('wordly_theme');else localStorage.setItem('wordly_theme',t);}catch(e){}if(t==='system')delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme=t;refreshSetupToggles();}
+function toggleCloudLockout() { cfg.cloudLockout = !cfg.cloudLockout; saveCfg(); refreshSetupToggles(); }
+async function testNet() {
+  const el=document.getElementById('test-msg'); el.textContent='Checking…'; el.className='msg';
+  try {
+    await fetch('https://wordly.ai/favicon.ico',{mode:'no-cors',cache:'no-store'});
+    el.textContent='Wordly is reachable.'; el.className='msg ok';
+  } catch(e) { el.textContent='Can’t reach Wordly. Check the network connection.'; el.className='msg err'; }
+}
+
+// ── v3.1a START mic auto-pick: saved device first, else most likely external mic ──
+const MIC_BUILTIN=/built-?in|internal|microphone array|macbook|intel|realtek|hdmi|smart sound|monitor/i;
+const MIC_LOWPRI=/bluetooth|airpods|webcam|camera|brio|c9\d\d/i;
+async function getMicList(){
+  let devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='audioinput');
+  if(devs.some(d=>!d.label)){
+    try{(await navigator.mediaDevices.getUserMedia({audio:true})).getTracks().forEach(t=>t.stop());}catch(e){}
+    devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='audioinput');
+  }
+  return devs;
+}
+function resolveMic(devs){
+  const real=devs.filter(d=>d.deviceId&&d.deviceId!=='default'&&d.deviceId!=='communications');
+  const saved=real.find(d=>d.deviceId===cfg.deviceId)||(cfg.deviceLabel&&real.find(d=>d.label===cfg.deviceLabel));
+  if(saved) return saved;
+  const ext=real.filter(d=>d.label&&!MIC_BUILTIN.test(d.label));
+  return ext.find(d=>!MIC_LOWPRI.test(d.label))||ext[0]||null;
+}
+function micPreselect(devs){const m=resolveMic(devs);return m?m.deviceId:(cfg.deviceId||'');}
+// ── v3.1a STOP ──
+
+async function buildWordlyPanel() {
+  const firstRun = needsSetup();
+  document.getElementById('panel').classList.toggle('first-run', firstRun);
+  document.getElementById('panel-title').textContent = firstRun ? 'Set up this presenter' : 'Settings';
+  let devOpts = '<option value="">Select device</option>';
+  try {
+    await navigator.mediaDevices.getUserMedia({audio:true}).then(s=>s.getTracks().forEach(t=>t.stop()));
+    const devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='audioinput');
+    devOpts=devs.map(d=>`<option value="${d.deviceId}" ${d.deviceId===micPreselect(devs)?'selected':''}>${d.label||'Mic '+d.deviceId.slice(0,6)}</option>`).join('');
+  } catch(e) {}
+
+  const schedHtml = isLegBuild() ? '' : `
+    <div class="psec">
+      <div class="psec-hrow"><div class="psec-h">Schedule</div><button type="button" class="link-btn" id="sched-clear-all" onclick="clearAllSchedule()" ${(cfg.schedStart||getSplits().length||cfg.schedEnd)?'':'hidden'}>Clear all</button></div>
+      <div class="hint">Optional. Each filled-in time runs once, within the next 24 hours. Leave a time empty to skip it.</div>
+      <div class="sched">
+        <div class="sched-row"><label for="s-start-t">Start</label><input type="time" id="s-start-t" value="${cfg.schedStart||''}" oninput="syncSched(this)" onkeyup="syncSched(this)" onchange="syncSched(this)" onblur="syncSched(this)"><button type="button" class="link-btn" onclick="clearTime('s-start-t')" aria-label="Clear start time" ${cfg.schedStart?'':'hidden'}>Clear</button></div>
+        <div id="split-rows" class="sched-split"></div>
+        <div class="sched-row"><label for="s-end-t">End</label><input type="time" id="s-end-t" value="${cfg.schedEnd||''}" oninput="syncSched(this)" onkeyup="syncSched(this)" onchange="syncSched(this)" onblur="syncSched(this)"><button type="button" class="link-btn" onclick="clearTime('s-end-t')" aria-label="Clear end time" ${cfg.schedEnd?'':'hidden'}>Clear</button></div>
+      </div>
+    </div>`;
+  document.getElementById('panel-body').innerHTML = `
+    ${firstRun ? '<p class="intro">Enter the session ID and passcode from the Wordly portal. You can start presenting once this is saved.</p>' : ''}
+    <div class="psec">
+      <div class="psec-h">Session</div>
+      <div class="hint" id="sess-hint">You can paste a Presenters link to fill in the session ID and passcode.</div>
+      <div class="field-row">
+        <div class="field">
+          <label class="fl" for="w-sid">Session ID</label>
+          <input type="text" id="w-sid" class="sid-input" value="${cfg.sessionId||''}" placeholder="ABCD-1234" autocomplete="off" spellcheck="false">
+          <div class="hint" id="w-hint"></div>
+        </div>
+        <div class="field">
+          <label class="fl" for="w-pass">Passcode</label>
+          <input type="text" id="w-pass" value="${cfg.passcode||''}" placeholder="Session passcode" autocomplete="off" spellcheck="false">
+        </div>
+      </div>
+      <label class="fl" for="w-pres">Presenter or room name</label>
+      <input type="text" id="w-pres" value="${cfg.presenter||''}" aria-required="true" placeholder="e.g. Main Hall Podium">
+      <div class="msg err" id="w-sess-msg" role="alert"></div>
+    </div>
+    <div class="psec">
+      <div class="psec-h">Microphone</div>
+      <label class="fl" for="w-dev">Audio input</label>
+      <div class="audio-row">
+        <select id="w-dev">${devOpts}</select>
+        <button class="btn btn-outline btn-test ic-mic" onclick="testAudio()">Test microphone (2 seconds)</button>
+      </div>
+      <div class="msg" id="w-msg"></div>
+    </div>
+    ${schedHtml}
+    <div class="psec">
+      <div class="psec-h">Device</div>
+      <span class="fl">Connection</span>
+      <div class="msg" id="test-msg" style="margin-top:0">Check that this device can reach Wordly.</div>
+      <button class="btn btn-outline btn-test ic-wifi" onclick="testNet()">Test connection</button>
+      <span class="fl">Theme</span>
+      <div class="seg" id="theme-seg" role="group" aria-label="Theme">
+        <button data-t="system" onclick="setTheme('system')">System</button>
+        <button data-t="light" onclick="setTheme('light')">Light</button>
+        <button data-t="dark" onclick="setTheme('dark')">Dark</button>
+      </div>
+      ${isLegBuild() ? `<span class="fl">Cloud control</span>
+      <button id="btn-lockout" class="btn btn-outline btn-test ic-lock" onclick="toggleCloudLockout()"></button>` : ''}
+    </div>`;
+  refreshSetupToggles();
+  renderSplits(getSplits());
+  lockSessionFieldsIfLive();
+  document.getElementById('panel-foot').innerHTML = `<button class="btn btn-primary btn-save ic-check" onclick="saveWordly()">${firstRun ? 'Save and continue' : 'Save and close'}</button>`;
+
+  document.getElementById('w-sid').addEventListener('input', e => {
+    const {sid,pass}=parseLink(e.target.value);
+    const hint=document.getElementById('w-hint');
+    if (sid) {
+      document.getElementById('w-sid').value=sid;
+      if (pass) document.getElementById('w-pass').value=pass;
+      hint.textContent=`Found session ${sid}`; hint.classList.add('ok');
+    } else { hint.textContent=''; hint.classList.remove('ok'); }
+  });
+}
+// ── Schedule fields in Settings ──
+// A field "has text" when it holds a full time or a half-typed one.
+function timeHasText(i) { return !!(i.value || i.validity.badInput); }
+function resetTime(i) { i.value = '00:00'; i.value = ''; }
+function updateClearAll() {
+  const ca = document.getElementById('sched-clear-all');
+  if (ca) ca.hidden = ![...document.querySelectorAll('.sched input[type=time]')].some(timeHasText);
+}
+function syncSched(i) {
+  const b = i.nextElementSibling; if (b) b.hidden = !timeHasText(i);
+  // Filling in the last Split field adds a new blank one below it
+  if (i.classList.contains('split-time') && i.value) {
+    const all = document.querySelectorAll('.split-time');
+    if (all[all.length - 1] === i) addSplitRow('');
+  }
+  updateClearAll();
+}
+function addSplitRow(value) {
+  const wrap = document.getElementById('split-rows'); if (!wrap) return;
+  const row = document.createElement('div'); row.className = 'sched-row';
+  row.innerHTML = '<label></label><input type="time" class="split-time" oninput="syncSched(this)" onkeyup="syncSched(this)" onchange="syncSched(this)" onblur="syncSched(this)"><button type="button" class="link-btn" onclick="clearSplit(this)">Clear</button>';
+  row.querySelector('input').value = value;
+  row.querySelector('button').hidden = !value;
+  wrap.appendChild(row);
+  renumberSplits();
+}
+function renumberSplits() {
+  const rows = [...document.querySelectorAll('#split-rows .sched-row')];
+  rows.forEach((r, n) => {
+    const id = 's-split-t-' + n, name = rows.length > 1 ? 'Split ' + (n + 1) : 'Split';
+    const l = r.querySelector('label'), i = r.querySelector('input'), b = r.querySelector('button');
+    i.id = id; l.htmlFor = id; l.textContent = name;
+    b.setAttribute('aria-label', 'Clear ' + name.toLowerCase() + ' time');
+  });
+}
+function renderSplits(times) {
+  const wrap = document.getElementById('split-rows'); if (!wrap) return;
+  wrap.innerHTML = '';
+  times.forEach(t => addSplitRow(t));
+  addSplitRow('');
+}
+// Clearing a Split removes its field, unless it is the only Split field left
+function clearSplit(btn) {
+  const row = btn.closest('.sched-row');
+  if (document.querySelectorAll('#split-rows .sched-row').length > 1) { row.remove(); renumberSplits(); }
+  else { resetTime(row.querySelector('input')); btn.hidden = true; }
+  updateClearAll();
+}
+function clearTime(id) {
+  const i = document.getElementById(id); if (!i) return;
+  resetTime(i); i.nextElementSibling.hidden = true; updateClearAll();
+}
+// Clear all: back to blank Start, one blank Split, blank End
+function clearAllSchedule() {
+  ['s-start-t', 's-end-t'].forEach(id => { const i = document.getElementById(id); if (i) { resetTime(i); i.nextElementSibling.hidden = true; } });
+  renderSplits([]);
+  updateClearAll();
+}
+
+// ── Automatic language selection (live screen, below the language buttons) ──
+// languages.json marks some languages "detectability": "none"; if the session uses any of them,
+// the switch is turned off and hidden, and an info message is shown in its place.
+// alsPref = what auto-selection should be when nothing blocks it (the session's setting, or the operator's
+// last choice on the switch). While a language that can't be auto-detected is on the buttons, auto-selection
+// is forced off; when the last such language is removed, it returns to alsPref.
+let alsPref = true;
+function undetectable(codes) { return (codes || []).filter(c => langDetect[c] === 'none'); }
+function updateAlsUi() {
+  const blocked = undetectable(sessionLangs).length > 0;
+  const t = document.getElementById('als-tog');
+  if (t) { t.disabled = blocked; t.checked = alsEnabled && !blocked; }
+  const row = document.getElementById('als-row'); if (row) row.hidden = blocked;   // the info message takes its place
+  const w = document.getElementById('als-warn'); if (w) w.hidden = !blocked;
+}
+// If the language list arrives after the session has connected, turn selection off then
+function onLangDataLoaded() {
+  buildLangGrid();   // names arrived: re-sort the buttons alphabetically
+  if (alsEnabled && undetectable(sessionLangs).length && ws && ws.readyState === WebSocket.OPEN) setAls(false, true);
+  else updateAlsUi();
+}
+
+// ── "More languages" picker (live screen) ──
+// Tapping a language that isn't on the language buttons adds it and makes it the speaker's (input)
+// language, and the picker closes. Tapping one that is already on the buttons removes it (unless it's the only one);
+// if it was the current language, the next button becomes current.
+const MAX_LANGS = 8;
+function escHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function langLabel(l) { return (l.native && l.native !== l.name) ? l.name + ' \u2014 ' + l.native : l.name; }
+function allLangs() {
+  if (langList.length) return langList.filter(l => l.transcribable !== false);
+  return Object.keys(langNames).map(code => ({ code, name: langNames[code], native: '', detect: langDetect[code] }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+function openLangModal() {
+  document.getElementById('lang-search').value = '';
+  renderLangList();
+  document.getElementById('lang-overlay').classList.add('open');
+  document.getElementById('lang-list').scrollTop = 0;
+}
+function closeLangModal() { document.getElementById('lang-overlay').classList.remove('open'); }
+function renderLangList() {
+  const list = document.getElementById('lang-list'); if (!list) return;
+  const q = document.getElementById('lang-search').value.trim().toLowerCase();
+  const rows = allLangs().filter(l => !q || l.name.toLowerCase().includes(q) || (l.native || '').toLowerCase().includes(q) || l.code.toLowerCase() === q);
+  list.innerHTML = rows.length ? rows.map(l => {
+    const sel = sessionLangs.includes(l.code), cur = l.code === currentLang;
+    return '<button type="button" role="option" class="lang-row' + (sel ? ' sel' : '') + (cur ? ' cur' : '') + '" aria-selected="' + sel + '"' +
+      ' onclick="pickLang(\'' + escHtml(l.code) + '\')"><span class="lang-txt"><span class="lang-name">' + escHtml(langLabel(l)) + '</span>' +
+      (l.detect === 'none' ? '<span class="lang-note">(auto-selection not supported)</span>' : '') + '</span>' +
+      (cur ? '<span class="lang-cur">Current</span>' : '') +
+      (sel ? '<span class="lang-check ic-check" aria-hidden="true"></span>' : '') + '</button>';
+  }).join('') : '<div class="lang-empty">No languages match \u201c' + escHtml(q) + '\u201d</div>';
+}
+// Language buttons are always alphabetical. When adding a language would make 9, the one spoken
+// least recently is dropped (the current language never is; never-spoken languages go first,
+// and among those the last alphabetically).
+const langLastSpoken = {};   // code → time it stopped being the current language
+let langPrevCurrent = '';
+function byLangName(a, b) { return (langNames[a] || a).localeCompare(langNames[b] || b); }
+function noteLangChange() {
+  if (langPrevCurrent && langPrevCurrent !== currentLang) langLastSpoken[langPrevCurrent] = Date.now();
+  langPrevCurrent = currentLang;
+}
+function leastRecentlySpoken(codes) {
+  const score = c => c === currentLang ? Infinity : (langLastSpoken[c] || 0);
+  return codes.slice().sort((a, b) => score(a) - score(b) || byLangName(b, a))[0];
+}
+function pickLang(code) {
+  const i = sessionLangs.indexOf(code);
+  const removing = i > -1 && sessionLangs.length > 1;   // already on the buttons: remove it, keep the picker open
+  if (removing) sessionLangs = sessionLangs.filter(c => c !== code);
+  else {
+    closeLangModal();
+    if (i === -1) {
+      if (sessionLangs.length >= MAX_LANGS) { const drop = leastRecentlySpoken(sessionLangs); sessionLangs = sessionLangs.filter(c => c !== drop); }
+      sessionLangs = [...sessionLangs, code];
+    }
+  }
+  sessionLangs.sort(byLangName);
+  const want = alsPref && !undetectable(sessionLangs).length, changed = want !== alsEnabled;
+  alsEnabled = want;
+  // the language to select: the new one, or the next button if the current one was removed
+  const next = removing ? (code === currentLang ? (sessionLangs[i] || sessionLangs[i - 1] || sessionLangs[0]) : null) : code;
+  if (next) switchLang(next);                                    // sends the language with the right auto-selection setting
+  else if (changed && ws && ws.readyState === WebSocket.OPEN) setAls(want, true);
+  else buildLangGrid();
+  updateAlsUi();
+  if (removing) renderLangList();
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.getElementById('lang-overlay')?.classList.contains('open')) closeLangModal(); });
+
+// Connection lost screen: the session can't be ended without a connection, so Exit just
+// returns to the start screen (audio, timer and connection were already stopped by showErr)
+function exitAfterError() {
+  document.getElementById('s-iframe').src = 'about:blank';
+  returnToIdle();
+}
+
+// Settings opened from a live session (gear on screens 3–4): the session can't change mid-session,
+// so Session ID and Passcode are read-only and the paste-a-link hint is hidden
+function lockSessionFieldsIfLive() {
+  const live = document.getElementById('screen-streaming').classList.contains('active');
+  ['w-sid', 'w-pass'].forEach(id => { const f = document.getElementById(id); if (f) f.disabled = live; });
+  const h = document.getElementById('sess-hint'); if (h) h.hidden = live;
+}
+function togPw() {
+  const i=document.getElementById('w-pass'),b=i.nextElementSibling;
+  i.type=i.type==='password'?'text':'password';
+  b.textContent=i.type==='password'?'Show':'Hide';
+}
+async function testAudio() {
+  const msg=document.getElementById('w-msg'),devId=document.getElementById('w-dev').value;
+  msg.textContent='Listening for 2 seconds…'; msg.className='msg';
+  try {
+    const constraints=devId?{audio:{deviceId:{exact:devId}}}:{audio:true};
+    const s=await navigator.mediaDevices.getUserMedia(constraints);
+    const ctx=new AudioContext();
+    const src=ctx.createMediaStreamSource(s);
+    const an=ctx.createAnalyser(); src.connect(an);
+    await new Promise(r=>setTimeout(r,2000));
+    const d=new Uint8Array(an.frequencyBinCount); an.getByteTimeDomainData(d);
+    const peak=Math.max(...d.map(v=>Math.abs(v-128)))/128;
+    s.getTracks().forEach(t=>t.stop()); ctx.close();
+    if (peak<0.02){msg.textContent='No signal detected. Check the microphone.';msg.className='msg err';}
+    else{msg.textContent=`Signal detected (${(peak*100).toFixed(0)}%)`;msg.className='msg ok';}
+    const devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='audioinput');
+    document.getElementById('w-dev').innerHTML=devs.map(d=>`<option value="${d.deviceId}" ${d.deviceId===micPreselect(devs)?'selected':''}>${d.label||'Mic '+d.deviceId.slice(0,6)}</option>`).join('');
+  } catch(e){msg.textContent=e.message;msg.className='msg err';}
+}
+
+// ═══════════════════════════════════════
+// LOCAL SCHEDULER
+// ═══════════════════════════════════════
+const schedTimers = { start: null, split: null, end: null };
+let schedPillInterval = null;
+
+function msUntil(hhmm) {
+  if (!hhmm) return null;
+  const [h, m] = hhmm.split(':').map(Number);
+  const now = new Date();
+  const target = new Date(now);
+  target.setHours(h, m, 0, 0);
+  if (target <= now) target.setDate(target.getDate() + 1);
+  return target - now;
+}
+
+// Split times are a list: a session can be split several times.
+// Older setups stored a single cfg.schedSplit; it is read here and migrated on save.
+function getSplits() {
+  if (Array.isArray(cfg.schedSplits)) return cfg.schedSplits.filter(Boolean);
+  return cfg.schedSplit ? [cfg.schedSplit] : [];
+}
+
+function clearSchedule() {
+  ['start', 'end'].forEach(k => {
+    if (schedTimers[k]) { clearTimeout(schedTimers[k]); schedTimers[k] = null; }
+  });
+  (schedTimers.splits || []).forEach(t => clearTimeout(t));
+  schedTimers.splits = [];
+  if (schedPillInterval) { clearInterval(schedPillInterval); schedPillInterval = null; }
+  updateSchedPill();
+}
+
+function armSchedule() {
+  clearSchedule();
+  if (cfg.schedStart) schedTimers.start = setTimeout(() => {
+    cfg.schedStart=''; saveCfg();
+    autoStart();
+    updateSchedPill();
+  }, msUntil(cfg.schedStart));
+  getSplits().forEach(time => {
+    schedTimers.splits.push(setTimeout(() => {
+      if (ws && ws.readyState === WebSocket.OPEN) doSplit();
+      const left = getSplits();
+      const i = left.indexOf(time); if (i > -1) left.splice(i, 1);
+      cfg.schedSplits = left; delete cfg.schedSplit; saveCfg(); updateSchedPill();
+    }, msUntil(time)));
+  });
+  if (cfg.schedEnd) schedTimers.end = setTimeout(() => {
+    if (ws && ws.readyState === WebSocket.OPEN) { stopAudio(); stopTimer(); wssStop('user'); wssDisconnect(true); showScreen('idle'); }
+    cfg.schedEnd=''; saveCfg(); updateSchedPill();
+  }, msUntil(cfg.schedEnd));
+  if (cfg.schedStart || getSplits().length || cfg.schedEnd) {
+    schedPillInterval = setInterval(updateSchedPill, 1000);
+    updateSchedPill();
+  }
+}
+
+// Scheduled Start only applies on the start screen: it presses Start Session there.
+function autoStart() {
+  if (!document.getElementById('screen-idle').classList.contains('active')) return;
+  const panel = document.getElementById('panel');
+  if (panel.classList.contains('open')) { if (needsSetup()) return; panel.classList.remove('open'); loadIdle(); }
+  document.getElementById('conf-overlay')?.classList.remove('open');
+  document.getElementById('btn-start').click();   // does nothing if Start Session is disabled (offline / not set up)
+}
+// Live screen: next Split or End (a scheduled Start is shown on the start screen instead)
+function nextSchedEntry() {
+  const entries = [
+    ...getSplits().map(time => ({ label: 'Split', time })),
+    { label: 'End',   time: cfg.schedEnd   },
+  ].filter(e => e.time).map(e => ({ ...e, ms: msUntil(e.time) }));
+  if (!entries.length) return null;
+  return entries.sort((a,b) => a.ms - b.ms)[0];
+}
+
+function fmtCountdown(ms) {
+  const t = Math.max(0, Math.round(ms / 1000)), pad = n => String(n).padStart(2, '0');
+  return pad(Math.floor(t / 3600)) + ':' + pad(Math.floor(t % 3600 / 60)) + ':' + pad(t % 60);
+}
+function renderSchedChip(pillId, cancelId, entry) {
+  const pill = document.getElementById(pillId), x = document.getElementById(cancelId);
+  if (!pill) return;
+  if (!entry) { pill.className = 'sched-pill'; pill.textContent = ''; if (x) x.style.display = 'none'; return; }
+  pill.textContent = entry.label + ' in ' + fmtCountdown(entry.ms);
+  pill.className = 'sched-pill active';
+  if (x) x.style.display = 'inline';
+}
+function updateSchedPill() {
+  renderSchedChip('sched-pill', 'sched-cancel', nextSchedEntry());
+  renderSchedChip('idle-sched-pill', 'idle-sched-cancel', cfg.schedStart ? { label: 'Start', ms: msUntil(cfg.schedStart) } : null);
+}
+function cancelScheduledStart() {
+  cfg.schedStart = ''; saveCfg();
+  if (schedTimers.start) { clearTimeout(schedTimers.start); schedTimers.start = null; }
+  updateSchedPill();
+}
+
+function cancelSchedule() {
+  cfg.schedStart=''; cfg.schedSplits=[]; delete cfg.schedSplit; cfg.schedEnd='';
+  saveCfg(); clearSchedule();
+}
+
+
+function saveWordly() {
+  const linkVal=document.getElementById('w-sid').value.trim();
+  const {sid:parsedSid,pass:parsedPass}=parseLink(linkVal);
+  const sid=parsedSid||normSid(document.getElementById('w-sid').value);
+  const sessErr=(id,t)=>{const m=document.getElementById('w-sess-msg');m.textContent=t;const f=document.getElementById(id);f.focus();f.scrollIntoView({block:'center'});};
+  if(!sid){sessErr('w-sid','Enter a session ID like ABCD-1234, or paste a Presenters link.');return;}
+  const pass=document.getElementById('w-pass').value.trim()||parsedPass;
+  if(!pass){sessErr('w-pass','Enter the session passcode.');return;}
+  if(!document.getElementById('w-pres').value.trim()){sessErr('w-pres','Enter a presenter or room name.');return;}
+  const sel=document.getElementById('w-dev');
+  if(!sel.value){const m=document.getElementById('w-msg');m.textContent='Choose a microphone. If none are listed, connect one and allow microphone access.';m.className='msg err';sel.focus();sel.scrollIntoView({block:'center'});return;}
+  cfg.sessionId=sid; cfg.passcode=pass;
+  cfg.presenter=document.getElementById('w-pres').value.trim();
+  cfg.deviceId=sel.value;
+  cfg.deviceLabel=sel.options[sel.selectedIndex]?.text||'';
+  cfg.schedStart = document.getElementById('s-start-t')?.value || '';
+  cfg.schedSplits = [...document.querySelectorAll('.split-time')].map(i => i.value).filter(Boolean); delete cfg.schedSplit;
+  cfg.schedEnd   = document.getElementById('s-end-t')?.value   || '';
+  saveCfg(); closePanel();
+  armSchedule();
+}
+
+// ═══════════════════════════════════════
+// LANGUAGE GRID
+// ═══════════════════════════════════════
+function launchCaptions() {
+  const sid = cfg.sessionId || '';
+  if (!sid) return;
+  const url = `https://attend.wordly.ai/frame/${sid}?fgsize=60px&showScrollbar=false&language=${currentLang}`;
+  window.open(url, '_blank', 'width=1920,height=1080');
+  const btn = document.getElementById('cap-pill');
+  btn.classList.add('fired');
+  setTimeout(() => btn.classList.remove('fired'), 1000);
+}
+
+function buildLangGrid() {
+  const grid=document.getElementById('ls-grid'); if(!grid) return;
+  sessionLangs.sort(byLangName);
+  noteLangChange();
+  const langs=sessionLangs.slice(0,8);
+  grid.classList.toggle('many', langs.length > 4);
+  // at the 8-language limit the picker is for swapping languages, not adding them
+  const more = document.getElementById('ls-all'); if (more) more.textContent = sessionLangs.length >= 8 ? 'Manage languages' : 'More languages';
+  grid.innerHTML=langs.map(code=>{
+    const name=langNames[code]||code;
+    return `<button class="ls-btn ${code===currentLang?'active':''}" onclick="switchLang('${code}')">${name}</button>`;
+  }).join('');
+}
+function switchLang(code) {
+  currentLang=code; buildLangGrid();
+  if(ws&&ws.readyState===WebSocket.OPEN){
+    ws.send(JSON.stringify({type:'stop'}));
+    ws.send(JSON.stringify({type:'start',languageCode:code,sampleRate:TARGET_SAMPLE_RATE,dynamicLanguageSelection:{enabled:alsEnabled}}));
+  }
+}
+function setAls(enabled, forced) {
+  if (!forced) alsPref = enabled;   // remember the operator's choice; forced changes don't overwrite it
+  alsEnabled=enabled; buildLangGrid(); updateAlsUi();
+  if(ws&&ws.readyState===WebSocket.OPEN){
+    ws.send(JSON.stringify({type:'stop'}));
+    ws.send(JSON.stringify({type:'start',languageCode:currentLang,sampleRate:TARGET_SAMPLE_RATE,dynamicLanguageSelection:{enabled}}));
+  }
+}
+
+// ═══════════════════════════════════════
+// AUDIO — resampling pipeline
+// ═══════════════════════════════════════
+function resample(input, srcRate, dstRate) {
+  if(srcRate===dstRate) return input;
+  const ratio=srcRate/dstRate, outLen=Math.floor(input.length/ratio);
+  const output=new Float32Array(outLen);
+  for(let i=0;i<outLen;i++){
+    const pos=i*ratio,idx=Math.floor(pos),frac=pos-idx;
+    output[i]=(input[idx]??0)+frac*((input[idx+1]??0)-(input[idx]??0));
+  }
+  return output;
+}
+function f32ToI16(f32) {
+  const i16=new Int16Array(f32.length);
+  for(let i=0;i<f32.length;i++){const s=Math.max(-1,Math.min(1,f32[i]));i16[i]=s<0?s*0x8000:s*0x7FFF;}
+  return i16;
+}
+
+async function startAudio() {
+  const mics=await getMicList();
+  const pick=resolveMic(mics);
+  const base={channelCount:1,echoCancellation:false,noiseSuppression:false,autoGainControl:false};
+  stream=await navigator.mediaDevices.getUserMedia({audio:pick?{...base,deviceId:{exact:pick.deviceId}}:base});
+  if(pick&&(pick.deviceId!==cfg.deviceId||pick.label!==cfg.deviceLabel)){cfg.deviceId=pick.deviceId;cfg.deviceLabel=pick.label;saveCfg();}
+  if(!pick){const r=document.getElementById('si-room');if(r)r.textContent='No external mic found. Using system default.';}
+  audioCtx=new AudioContext();
+  const nativeRate=audioCtx.sampleRate;
+  const src=audioCtx.createMediaStreamSource(stream);
+  const bufSize=Math.max(256,Math.pow(2,Math.ceil(Math.log2(CHUNK_FRAMES*nativeRate/TARGET_SAMPLE_RATE))));
+  processor=audioCtx.createScriptProcessor(bufSize,1,1);
+  pcmBuffer=new Float32Array(0);
+  processor.onaudioprocess=e=>{
+    const input=e.inputBuffer.getChannelData(0);
+    const resampled=resample(input,nativeRate,TARGET_SAMPLE_RATE);
+    const combined=new Float32Array(pcmBuffer.length+resampled.length);
+    combined.set(pcmBuffer); combined.set(resampled,pcmBuffer.length);
+    pcmBuffer=combined;
+    let peak=0;
+    for(let i=0;i<resampled.length;i++){const a=Math.abs(resampled[i]);if(a>peak)peak=a;}
+    const fill=document.getElementById('meter-fill');
+    if(fill) fill.style.width=Math.min(peak*400,100).toFixed(1)+'%';
+    while(pcmBuffer.length>=CHUNK_FRAMES){
+      const chunk=pcmBuffer.slice(0,CHUNK_FRAMES);
+      pcmBuffer=pcmBuffer.slice(CHUNK_FRAMES);
+      if(!muted&&connected&&ws&&ws.readyState===WebSocket.OPEN) ws.send(f32ToI16(chunk).buffer);
+    }
+  };
+  src.connect(processor);
+  processor.connect(audioCtx.destination);
+}
+
+function stopAudio() {
+  if(processor){processor.disconnect();processor=null;}
+  if(audioCtx){audioCtx.close();audioCtx=null;}
+  if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
+  pcmBuffer=new Float32Array(0);
+  const fill=document.getElementById('meter-fill');if(fill)fill.style.width='0%';
+}
+
+// ═══════════════════════════════════════
+// WSS
+// ═══════════════════════════════════════
+// ── RECOVERY GATE ────────────────────────────────────────────────────────────
+// Single chokepoint for all auto-reconnect decisions.
+// Future: add schedule/override checks inside here — nowhere else.
+function shouldAutoRecover() {
+  return stopReason === 'drop';
+  // When scheduling is added:
+  //   if (stopReason === 'schedule') return scheduleWantsRestart();
+  //   if (stopReason === 'user') return false; // human wins
+}
+
+function scheduleReconnect() {
+  if (!shouldAutoRecover()) return;
+  if (retryCount >= MAX_RETRIES) {
+    showErr('Could not reconnect after multiple attempts. Check network and session.');
+    return;
+  }
+  const delay = RETRY_DELAYS[Math.min(retryCount, RETRY_DELAYS.length - 1)];
+  retryCount++;
+  setStatus('warn',`Reconnecting (${retryCount}/${MAX_RETRIES})`);
+  showScreen('streaming'); // keep streaming screen visible during recovery
+  retryTimer = setTimeout(async () => {
+    if (!shouldAutoRecover()) return;
+    try {
+      stopAudio();
+      await startAudio();
+      startWSS();
+    } catch(e) {
+      scheduleReconnect(); // audio failed — try again
+    }
+  }, delay);
+}
+
+function cancelReconnect() {
+  if (retryTimer) { clearTimeout(retryTimer); retryTimer = null; }
+  retryCount = 0;
+}
+
+function startWSS() {
+  ws=new WebSocket(WSS_URL);
+  ws.binaryType='arraybuffer';
+  ws.onopen=()=>{
+    const msg={type:'connect',presentationCode:cfg.sessionId,accessKey:cfg.passcode,connectionCode:CONNECTION_CODE};
+    if(cfg.presenter) msg.name=cfg.presenter;
+    ws.send(JSON.stringify(msg));
+  };
+  ws.onmessage=e=>{
+    if(typeof e.data!=='string') return;
+    try {
+      const d=JSON.parse(e.data);
+      if(d.type==='status'&&d.action==='connect'){
+        if(!d.success){
+          stopReason='user'; // session gone/invalid — don't retry
+          cancelReconnect();
+          showErr(d.message||'Connection rejected.');
+          return;
+        }
+        sessionLangs=d.languageCodes||[];
+        alsPref=(d.dynamicLanguageSelection?.enabled!==false);
+        alsEnabled=alsPref && !undetectable(sessionLangs).length;
+        currentLang='';
+        updateAlsUi();
+        buildLangGrid();
+        ws.send(JSON.stringify({type:'start',languageCode:currentLang||'en',sampleRate:TARGET_SAMPLE_RATE,dynamicLanguageSelection:{enabled:alsEnabled}}));
+      } else if(d.type==='status'&&d.action==='start'){
+        if(d.success){
+          connected=true;
+          if(d.languageCode) { currentLang=d.languageCode; buildLangGrid(); }
+          setStatus('live','Live');
+          if(!timerStart) startTimer();
+          echoTimer=setInterval(()=>{if(ws&&ws.readyState===WebSocket.OPEN)ws.send(JSON.stringify({type:'echo'}));},ECHO_MS);
+          const iUrl=`https://attend.wordly.ai/frame/${cfg.sessionId}?fgsize=30px&showScrollbar=false&language=${currentLang}`;
+          setTimeout(()=>{document.getElementById('s-iframe').src=iUrl;},1000);
+        }
+      } else if(d.type==='status'){
+        if(d.languageCode&&alsEnabled){currentLang=d.languageCode;buildLangGrid();}
+      } else if(d.type==='error'){
+        showErr(d.message||'Wordly error.');
+      } else if(d.type==='end'){
+        // Session ended by portal — don't retry, session no longer exists
+        stopReason='user'; doEnded('portal');
+      }
+    } catch(ex){}
+  };
+  ws.onerror=()=>{
+    if(connected){ stopReason='drop'; scheduleReconnect(); }
+    else showErr('WebSocket error — check network.');
+  };
+  ws.onclose=e=>{
+    if(connected){
+      connected=false;
+      stopReason='drop';
+      scheduleReconnect();
+    }
+  };
+}
+
+function wssStop(reason='user'){
+  stopReason=reason;
+  cancelReconnect();
+  if(echoTimer){clearInterval(echoTimer);echoTimer=null;}
+  connected=false;
+  if(!ws||ws.readyState!==WebSocket.OPEN){ws=null;return;}
+  try{
+    ws.onclose=null; // intentional stop — suppress drop handler
+    ws.onerror=null;
+    ws.send(JSON.stringify({type:'stop'}));
+  }catch(ex){}
+}
+function wssSend(msg){if(ws&&ws.readyState===WebSocket.OPEN)ws.send(JSON.stringify(msg));}
+function wssDisconnect(end){
+  wssSend({type:'disconnect',end});
+  setTimeout(()=>{if(ws){ws.close();ws=null;}},400);
+}
+function showErr(msg){
+  stopAudio();stopTimer();wssStop();connected=false;
+  document.getElementById('e-msg').textContent=msg;
+  showScreen('error');
+}
+
+// ═══════════════════════════════════════
+// SESSION CONTROLS
+// ═══════════════════════════════════════
+async function startSession(){
+  if(document.getElementById('btn-start').classList.contains('disabled')) return;
+  if(audioCtx||stream) return; // guard double-tap
+  muted=false;// stopReason reset on returnToIdle
+  connected=false;
+  document.getElementById('screen-streaming').classList.remove('muted');
+  document.getElementById('btn-mute').textContent='Mute';
+  document.getElementById('btn-mute').classList.remove('muted');
+  document.getElementById('si-timer').textContent='00:00:00';
+  setStatus('wait','Connecting…');
+  document.getElementById('meter-fill').style.width='0%';
+  document.getElementById('s-iframe').src='about:blank';
+  document.getElementById('ls-grid').innerHTML='';
+  showScreen('streaming');
+  try{await startAudio();startWSS();}
+  catch(e){showErr('Mic error: '+e.message+'\n\nCheck browser mic permission.');}
+}
+
+function toggleMute(){
+  const btn=document.getElementById('btn-mute');
+  if(muted){
+    muted=false;
+    wssSend({type:'start',languageCode:currentLang,sampleRate:TARGET_SAMPLE_RATE,dynamicLanguageSelection:{enabled:alsEnabled}});
+    setStatus('live','Live');
+    document.getElementById('screen-streaming').classList.remove('muted');
+    btn.textContent='Mute';btn.classList.remove('muted');
+  } else {
+    muted=true;
+    wssSend({type:'stop'});
+    setStatus('muted','Muted');
+    document.getElementById('screen-streaming').classList.add('muted');
+    btn.textContent='Unmute';btn.classList.add('muted');
+    document.getElementById('meter-fill').style.width='0%';
+  }
+}
+
+function doSplit(){
+  wssSend({type:'split'});
+  const b=document.getElementById('btn-split');
+  b.classList.add('flash');b.textContent='Split done';
+  setTimeout(()=>{b.classList.remove('flash');b.textContent='Split now';},1800);
+}
+
+function doLeave(){
+  stopAudio();stopTimer();wssStop('user');
+  document.getElementById('s-iframe').src='about:blank';
+  wssDisconnect(false);
+  cfg.leftOpen=true;saveCfg();
+  returnToIdle();
+}
+
+function doEnd(){
+  stopAudio();stopTimer();wssStop('user');
+  document.getElementById('s-iframe').src='about:blank';
+  wssDisconnect(true);
+  doEnded('local');
+}
+
+function doEnded(reason){
+  stopAudio();stopTimer();connected=false;
+  if(reason!=='leave'){cfg.leftOpen=false;saveCfg();}
+  showScreen('ended');
+  document.getElementById('en-sub').textContent=
+    reason==='portal'?'Session closed from the Wordly portal.':
+    reason==='leave' ?'You have left. Attendees remain connected.':
+                      'Session ended.';
+  startCd();
+}
+
+function askEndOpen(){
+  if(!cfg.leftOpen){
+    const h=document.getElementById('start-hint');
+    h.textContent='No open session to end.';
+    setTimeout(loadIdle,4000);
+    return;
+  }
+  confirm2('End session '+cfg.sessionId+' for everyone?', endOpenSession);
+}
+function endOpenSession(){
+  const hint=document.getElementById('start-hint');
+  hint.textContent='Ending session…';
+  let done=false;
+  const sock=new WebSocket(WSS_URL);
+  const finish=(msg,clear)=>{
+    if(done) return; done=true;
+    if(clear){cfg.leftOpen=false;saveCfg();}
+    try{sock.close();}catch(e){}
+    hint.textContent=msg;
+    setTimeout(loadIdle,4000);
+  };
+  sock.onopen=()=>{
+    const m={type:'connect',presentationCode:cfg.sessionId,accessKey:cfg.passcode,connectionCode:CONNECTION_CODE};
+    if(cfg.presenter) m.name=cfg.presenter;
+    sock.send(JSON.stringify(m));
+  };
+  sock.onmessage=e=>{
+    if(typeof e.data!=='string') return;
+    let d; try{d=JSON.parse(e.data);}catch(x){return;}
+    if(d.type==='status'&&d.action==='connect'){
+      if(!d.success){finish('Session already closed.',true);return;}
+      sock.send(JSON.stringify({type:'disconnect',end:true}));
+      setTimeout(()=>finish('Session ended.',true),500);
+    } else if(d.type==='end'){finish('Session ended.',true);}
+  };
+  sock.onerror=()=>finish('Could not reach Wordly. Session not ended.',false);
+  setTimeout(()=>finish('Timed out. Session may still be open.',false),4000);
+}
+
+// ═══════════════════════════════════════
+// TIMER + COUNTDOWN
+// ═══════════════════════════════════════
+function startTimer(){
+  timerStart=Date.now();
+  timerInt=setInterval(()=>{
+    const el=document.getElementById('si-timer');
+    if(el)el.textContent=fmtTime(Math.floor((Date.now()-timerStart)/1000));
+  },1000);
+}
+function stopTimer(){clearInterval(timerInt);timerInt=null;timerStart=null;}
+
+function startCd(){
+  const end=Date.now()+60000;
+  function tick(){
+    const rem=Math.ceil((end-Date.now())/1000);
+    const el=document.getElementById('en-cd');if(!el)return;
+    if(rem<=0){cancelCd();returnToIdle();return;}
+    el.textContent=`Returning to the start screen in ${rem}s`;
+    cdTimer=setTimeout(tick,500);
+  }
+  tick();
+}
+function cancelCd(){clearTimeout(cdTimer);cdTimer=null;const el=document.getElementById('en-cd');if(el)el.textContent='Staying here until you return.';}
+function returnToIdle(){cancelCd();// stopReason reset on returnToIdle
+  loadIdle();showScreen('idle');}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+// Orientation follows the window: portrait when it is taller than it is wide
+function applyOrientation() { document.body.classList.toggle('portrait', window.innerHeight > window.innerWidth); }
+applyOrientation();
+window.addEventListener('resize', applyOrientation);
+loadIdle();
+if (needsSetup()) openPanel();
+// Re-arm any saved schedule after a restart or reload
+if (cfg.schedStart || getSplits().length || cfg.schedEnd) armSchedule();
+window.addEventListener('online',loadIdle);
+window.addEventListener('offline',loadIdle);
+</script>
+</body>
+</html>

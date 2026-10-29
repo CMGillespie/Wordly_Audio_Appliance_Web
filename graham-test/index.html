@@ -616,6 +616,12 @@ body.portrait .audio-row .btn-test { align-self: flex-start; min-height: 48px; }
 /* ── Confirm dialog ── */
 #conf-overlay { position: fixed; inset: 0; background: var(--overlay); z-index: 200; display: none; align-items: center; justify-content: center; }
 #conf-overlay.open { display: flex; }
+/* Muted-but-talking alert: backdrop pulses slowly between black and red */
+#mute-alert { position: fixed; inset: 0; z-index: 250; display: none; align-items: center; justify-content: center; padding: 16px;
+  background: rgba(0,0,0,0.78); animation: alarm-bg 1.4s ease-in-out infinite alternate; }
+#mute-alert.open { display: flex; }
+@keyframes alarm-bg { from { background-color: rgba(0,0,0,0.78); } to { background-color: rgba(200,24,16,0.82); } }
+@media (prefers-reduced-motion: reduce) { #mute-alert { background-color: rgba(140,16,10,0.85) !important; } }
 .conf-box  { background: var(--card); border: 1px solid var(--card-border); border-radius: 16px; padding: 30px 30px 24px; max-width: 460px; width: 90%; box-shadow: var(--shadow-xl); }
 .conf-head { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
 .conf-ic { display: flex; flex-shrink: 0; color: var(--text); }
@@ -760,6 +766,17 @@ body.portrait .sbot .btn      { font-size: 15px; gap: 6px; }
   </div>
 </div>
 
+<!-- MUTED-BUT-TALKING ALERT -->
+<div id="mute-alert" role="alertdialog" aria-modal="true" aria-labelledby="mute-alert-title">
+  <div class="conf-box">
+    <div class="conf-head"><span class="conf-ic ic-micoff is-danger" aria-hidden="true"></span><div class="conf-title" id="mute-alert-title">Audio was detected, but you’re muted.</div></div>
+    <div class="conf-btns" style="margin-top:24px">
+      <button class="btn btn-outline" onclick="mutedAlertDismiss()">Dismiss</button>
+      <button class="btn btn-primary" id="mute-alert-unmute" onclick="mutedAlertUnmute()">Unmute</button>
+    </div>
+  </div>
+</div>
+
 <!-- CONFIRM -->
 <div id="conf-overlay" role="dialog" aria-modal="true" aria-labelledby="conf-title">
   <div class="conf-box">
@@ -858,6 +875,7 @@ function parseLink(raw) {
 }
 function setStatus(state,text){const e=document.getElementById('si-status');e.textContent=text;e.dataset.state=state;}
 function showScreen(id) {
+  if (id !== 'streaming') { hideMutedAlert(); mutedAlertDismissed = false; }   // leaving the live screen = session over
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-'+id).classList.add('active');
 }
@@ -1204,6 +1222,51 @@ function lockSessionFieldsIfLive() {
   ['w-sid', 'w-pass'].forEach(id => { const f = document.getElementById(id); if (f) f.disabled = live; });
   const h = document.getElementById('sess-hint'); if (h) h.hidden = live;
 }
+
+// ── "Audio was detected, but you're muted" alert ──
+// While muted, sustained sound on the mic (about 1.2 s of it within a few seconds) pops up a reminder.
+// It hides itself after 5 s without sound and comes back if the talking starts again.
+// Dismiss turns it off for the rest of the session; Unmute unmutes. It also closes on unmute or when the session ends.
+// "Sound" is judged against the room's own background level, since raw mic levels vary a lot
+// (the app turns off the browser's automatic gain, so a laptop mic reads much lower than a USB mic).
+const MUTED_TALK_MIN = 0.015;          // never count anything quieter than this (about 6% of the audio meter)
+const MUTED_TALK_OVER_FLOOR = 4;       // sound must be at least 4× the background level
+const MUTED_TALK_MS = 1200;
+const MUTED_QUIET_HIDE_MS = 5000;
+let mutedLoudMs = 0, mutedLastTick = 0, mutedLastLoud = 0, mutedAlertDismissed = false, mutedNoiseFloor = 0.01;
+function mutedAudioCheck(peak) {
+  const now = performance.now(), dt = mutedLastTick ? Math.min(now - mutedLastTick, 250) : 0;
+  mutedLastTick = now;
+  // background level: follows quiet moments quickly, rises only slowly during sound
+  mutedNoiseFloor = peak < mutedNoiseFloor ? mutedNoiseFloor * 0.8 + peak * 0.2 : mutedNoiseFloor * 0.995 + peak * 0.005;
+  const threshold = Math.max(MUTED_TALK_MIN, mutedNoiseFloor * MUTED_TALK_OVER_FLOOR);
+  const loud = peak >= threshold;
+  if (loud) mutedLastLoud = now;
+  const open = document.getElementById('mute-alert')?.classList.contains('open');
+  if (!open) {
+    mutedLoudMs = loud ? mutedLoudMs + dt : Math.max(0, mutedLoudMs - dt * 0.25);   // decays slowly in pauses between words
+    if (mutedLoudMs >= MUTED_TALK_MS && !mutedAlertDismissed &&
+        document.getElementById('screen-streaming').classList.contains('active')) showMutedAlert();
+  } else if (now - mutedLastLoud >= MUTED_QUIET_HIDE_MS) hideMutedAlert();
+  if (MUTED_DEBUG) showMutedDebug(peak, threshold, loud);
+}
+// Add ?debug to the address to see the detector's numbers on screen (bottom-left) while muted
+const MUTED_DEBUG = /[?&]debug\b/.test(location.search);
+function showMutedDebug(peak, threshold, loud) {
+  let d = document.getElementById('muted-debug');
+  if (!d) { d = document.createElement('div'); d.id = 'muted-debug'; d.style.cssText = 'position:fixed;left:6px;bottom:6px;z-index:999;font:12px/1.4 monospace;background:rgba(0,0,0,.75);color:#fff;padding:6px 8px;border-radius:6px;pointer-events:none'; document.body.appendChild(d); }
+  const pct = v => Math.round(Math.min(v * 400, 100)) + '%';
+  d.textContent = `peak ${pct(peak)}  background ${pct(mutedNoiseFloor)}  needs ${pct(threshold)}  ${loud ? 'SOUND' : 'quiet'}  ${Math.round(mutedLoudMs)}/${MUTED_TALK_MS} ms${mutedAlertDismissed ? '  (dismissed)' : ''}`;
+}
+function showMutedAlert() {
+  const o = document.getElementById('mute-alert');
+  if (!o || o.classList.contains('open')) return;
+  o.classList.add('open'); mutedLoudMs = 0; mutedLastLoud = performance.now();
+  document.getElementById('mute-alert-unmute').focus();
+}
+function hideMutedAlert() { document.getElementById('mute-alert')?.classList.remove('open'); mutedLoudMs = 0; }
+function mutedAlertUnmute() { hideMutedAlert(); if (muted) toggleMute(); }
+function mutedAlertDismiss() { hideMutedAlert(); mutedAlertDismissed = true; }   // until this session ends
 function togPw() {
   const i=document.getElementById('w-pass'),b=i.nextElementSibling;
   i.type=i.type==='password'?'text':'password';
@@ -1439,6 +1502,7 @@ async function startAudio() {
     for(let i=0;i<resampled.length;i++){const a=Math.abs(resampled[i]);if(a>peak)peak=a;}
     const fill=document.getElementById('meter-fill');
     if(fill) fill.style.width=Math.min(peak*400,100).toFixed(1)+'%';
+    if(muted) mutedAudioCheck(peak);
     while(pcmBuffer.length>=CHUNK_FRAMES){
       const chunk=pcmBuffer.slice(0,CHUNK_FRAMES);
       pcmBuffer=pcmBuffer.slice(CHUNK_FRAMES);
@@ -1603,13 +1667,13 @@ async function startSession(){
 function toggleMute(){
   const btn=document.getElementById('btn-mute');
   if(muted){
-    muted=false;
+    muted=false; hideMutedAlert();
     wssSend({type:'start',languageCode:currentLang,sampleRate:TARGET_SAMPLE_RATE,dynamicLanguageSelection:{enabled:alsEnabled}});
     setStatus('live','Live');
     document.getElementById('screen-streaming').classList.remove('muted');
     btn.textContent='Mute';btn.classList.remove('muted');
   } else {
-    muted=true;
+    muted=true; mutedLoudMs=0; mutedLastTick=0;
     wssSend({type:'stop'});
     setStatus('muted','Muted');
     document.getElementById('screen-streaming').classList.add('muted');
